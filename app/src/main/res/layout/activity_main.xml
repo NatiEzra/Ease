@@ -10,7 +10,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView"
-        android:name="com.example.ease.loginFragment"
+        android:name="com.example.ease.RegisterFragment"
         android:layout_width="420dp"
         android:layout_height="750dp"
         app:layout_constraintBottom_toBottomOf="parent"

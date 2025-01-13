@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         }
         //set the loginRegister fragment
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.login_fragment, loginFragment())
+            replace(R.id.register_fragment, RegisterFragment())
             commit()
         }
 
