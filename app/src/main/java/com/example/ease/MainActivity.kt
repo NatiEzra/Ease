@@ -16,11 +16,7 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        //set the loginRegister fragment
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.register_fragment, RegisterFragment())
-            commit()
-        }
+
 
     }
 }

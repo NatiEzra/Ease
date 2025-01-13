@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -27,6 +29,7 @@ class loginFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
     }
 
     override fun onCreateView(
@@ -34,7 +37,16 @@ class loginFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false)
+        val view = inflater.inflate(R.layout.fragment_login, container, false)
+
+        val newMemberTextView: TextView = view.findViewById(R.id.new_member_link)
+        //val newMemberTextView: Button = view.findViewById(R.id.login_button)
+
+        newMemberTextView.setOnClickListener {
+            // Call the activity's method to replace the fragment
+            (activity as? LoginRegisterActivity)?.onNewMemberClicked(it)
+        }
+        return view
     }
 
     companion object {
