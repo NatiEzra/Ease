@@ -1,11 +1,21 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-}
 
+}
+val secretsPropertiesFile = rootProject.file("secrets.properties")
+val secretsProperties =  Properties()
+secretsProperties.load( FileInputStream(secretsPropertiesFile))
 android {
     namespace = "com.example.ease"
     compileSdk = 35
+    buildFeatures {
+        buildConfig = true
+    }
+
 
     defaultConfig {
         applicationId = "com.example.ease"
@@ -13,8 +23,8 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "GOOGLE_CLIENT_ID", secretsProperties["GOOGLE_CLIENT_ID"] as String)
     }
 
     buildTypes {
@@ -42,7 +52,9 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
 }

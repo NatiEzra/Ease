@@ -37,10 +37,16 @@ class LoginRegisterActivity : AppCompatActivity() {
 
              supportFragmentManager.beginTransaction().apply {
                  replace(R.id.fragment_container, RegisterFragment())
-                 addToBackStack(null)  // Optional: adds this transaction to the back stack
                  commit()
              }
 
 
+    }
+    fun onBackButtonClicked(view: View) {
+        // Replace the register fragment with the login fragment
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_container, loginFragment())
+            commit()
+        }
     }
 }

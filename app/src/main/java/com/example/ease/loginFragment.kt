@@ -1,5 +1,6 @@
 package com.example.ease
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -7,19 +8,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [loginFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private const val ARG_PARAM1 = "param1"
+    private const val ARG_PARAM2 = "param2"
+
 class loginFragment : Fragment() {
-    // TODO: Rename and change types of parameters
+
+    private lateinit var googleSignInClient: GoogleSignInClient
     private var param1: String? = null
     private var param2: String? = null
 
@@ -29,7 +34,13 @@ class loginFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+        // Configure Google Sign-In
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestIdToken(BuildConfig.GOOGLE_CLIENT_ID)
+            .build()
 
+        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
     }
 
     override fun onCreateView(
@@ -39,9 +50,12 @@ class loginFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_login, container, false)
 
-        val newMemberTextView: TextView = view.findViewById(R.id.new_member_link)
-        //val newMemberTextView: Button = view.findViewById(R.id.login_button)
+        val googleLoginButton: Button = view.findViewById(R.id.google_login)
+        googleLoginButton.setOnClickListener {
+            signInWithGoogle()
+        }
 
+        val newMemberTextView: TextView = view.findViewById(R.id.new_member_link)
         newMemberTextView.setOnClickListener {
             // Call the activity's method to replace the fragment
             (activity as? LoginRegisterActivity)?.onNewMemberClicked(it)
@@ -49,16 +63,32 @@ class loginFragment : Fragment() {
         return view
     }
 
+    private fun signInWithGoogle() {
+        val signInIntent = googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            handleSignInResult(task)
+        }
+    }
+
+    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+        try {
+            val account = completedTask.getResult(ApiException::class.java)
+            // Signed in successfully, show authenticated UI.
+        } catch (e: ApiException) {
+            // Sign in failed, handle the error
+        }
+    }
+
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment loginFragment.
-         */
-        // TODO: Rename and change types and number of parameters
+        private const val RC_SIGN_IN = 9001
+
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             loginFragment().apply {
