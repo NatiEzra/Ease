@@ -3,9 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/fragment_feed"
     tools:context=".FeedFragment">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/fragment_feed_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </androidx.core.widget.NestedScrollView>
