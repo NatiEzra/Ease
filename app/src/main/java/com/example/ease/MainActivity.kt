@@ -1,6 +1,7 @@
 package com.example.ease
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
@@ -9,6 +10,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +49,8 @@ class MainActivity : AppCompatActivity() {
         homePageButton.setOnClickListener {
             homePageButtonClicked()
         }
+
+        val db = Firebase.firestore
 
     }
 

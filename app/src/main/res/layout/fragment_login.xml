@@ -34,7 +34,7 @@
         app:layout_constraintTop_toBottomOf="@+id/logo_image" />
 
     <EditText
-        android:id="@+id/username_field"
+        android:id="@+id/email_field_login"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -42,13 +42,13 @@
         android:layout_marginEnd="32dp"
         android:drawableLeft="@drawable/ic_user"
         android:drawablePadding="8dp"
-        android:padding="12dp"
-        android:hint="username"
-        android:textAlignment="viewStart"
         android:gravity="start"
-        android:textColorHint="#808080"
-        android:textColor="#000000"
+        android:hint="email"
         android:minHeight="48dp"
+        android:padding="12dp"
+        android:textAlignment="viewStart"
+        android:textColor="#000000"
+        android:textColorHint="#808080"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/login_title" />
@@ -74,7 +74,7 @@
         android:textColorHint="#808080"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/username_field" />
+        app:layout_constraintTop_toBottomOf="@id/email_field_login" />
 
     <TextView
         android:id="@+id/new_member_link"
