@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
+// CHECK
     fun addPostButtonClicked() {
         // Replace the register fragment with the login fragment
         supportFragmentManager.beginTransaction().apply {
