@@ -5,6 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import com.example.ease.model.AuthRepository
+import com.example.ease.model.User
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -34,7 +37,12 @@ class addPostFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_add_post, container, false)
+        var view= inflater.inflate(R.layout.fragment_add_post, container, false)
+        var profileName=view.findViewById<TextView>(R.id.profileName)
+        profileName.text = (activity as? MainActivity)?.getUserName()
+
+
+        return view;
     }
 
     companion object {

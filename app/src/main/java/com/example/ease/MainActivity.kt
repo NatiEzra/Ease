@@ -4,16 +4,19 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.example.ease.model.User
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
+    var profileName: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -50,8 +53,16 @@ class MainActivity : AppCompatActivity() {
             homePageButtonClicked()
         }
 
-        val db = Firebase.firestore
+        var userServer= User.shared
+        userServer.getName { name ->
+            if (name != null) {
+                profileName = name
+            }
+        }
 
+    }
+    fun getUserName(): String {
+        return profileName;
     }
 
 // CHECK

@@ -73,11 +73,7 @@ class loginFragment : Fragment() {
 
         return view
     }
-    fun navigateToHome() {
-        val intent = Intent(requireContext(), MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         emailField = view.findViewById(R.id.email_field_login)
@@ -106,7 +102,7 @@ class loginFragment : Fragment() {
             server.loginUser(email, password) { success, error ->
                 if (success) {
                     Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
-                    navigateToHome()
+                    (activity as? LoginRegisterActivity)?.navigateToHome()
                 } else {
                     Toast.makeText(requireContext(), error ?: "Login failed", Toast.LENGTH_SHORT).show()
                 }

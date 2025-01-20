@@ -1,12 +1,16 @@
 package com.example.ease
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
+import com.example.ease.model.AuthRepository
+import com.example.ease.model.User
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -22,6 +26,12 @@ class RegisterFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private lateinit var emailField: TextView
+    private lateinit var passwordField: TextView
+    private lateinit var confirmPasswordField: TextView
+    private lateinit var registerButton: Button
+    private lateinit var name: TextView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +54,50 @@ class RegisterFragment : Fragment() {
             (activity as? LoginRegisterActivity)?.onBackButtonClicked(it)
         }
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        emailField = view.findViewById(R.id.email_field)
+        passwordField = view.findViewById(R.id.password_field)
+        confirmPasswordField = view.findViewById(R.id.confirm_password_field)
+        registerButton = view.findViewById(R.id.Register_button)
+        name = view.findViewById(R.id.username_field)
+
+        setupListeners()
+
+    }
+
+    private fun setupListeners() {
+        var authServer=AuthRepository.shared
+        var userServer=User.shared
+        registerButton.setOnClickListener {
+
+            val email = emailField.text.toString()
+            val password = passwordField.text.toString()
+            val confirmPassword = confirmPasswordField.text.toString()
+            val username = name.text.toString()
+            if (password != confirmPassword) {
+                Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            authServer.registerUser(email, password) { success, error ->
+                if (success) {
+                    userServer.createUser(username,email){success,error->
+                        if (success) {
+                            Log.d("TAG", "User added to database")
+                        } else {
+                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    (activity as? LoginRegisterActivity)?.navigateToHome()
+                    Log.d("TAG", "User registered successfully ")
+                } else {
+                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        }
     }
 
     companion object {

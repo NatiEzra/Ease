@@ -1,4 +1,5 @@
 package com.example.ease
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -7,13 +8,18 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.ease.model.AuthRepository
 
 
 class LoginRegisterActivity : AppCompatActivity() {
-
+    var authServer=AuthRepository.shared
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
+            if (authServer.isUserLoggedIn()) {
+                navigateToHome()
+                return
+            }
             enableEdgeToEdge()
             setContentView(R.layout.activity_login_register)
             ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -49,4 +55,12 @@ class LoginRegisterActivity : AppCompatActivity() {
             commit()
         }
     }
+
+    fun navigateToHome() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        finish()
+    }
+
 }
