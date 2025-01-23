@@ -26,7 +26,7 @@ class User{
                 onComplete(false, e.localizedMessage)
             }
     }
-    fun getName(onComplete: (String?) -> Unit) {
+    fun getUser(onComplete: (Map<String, Any>?) -> Unit) {
         val userEmail = auth.currentUser?.email
         if (userEmail != null) {
             db.collection("users")
@@ -35,8 +35,8 @@ class User{
                 .addOnSuccessListener { documents ->
                     if (!documents.isEmpty) {
                         val userDocument = documents.documents[0]
-                        val userName = userDocument.getString("name")
-                        onComplete(userName)
+                        val user= userDocument.data
+                        onComplete(user)
                     } else {
                         onComplete(null)
                     }

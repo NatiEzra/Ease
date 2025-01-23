@@ -16,7 +16,8 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
-    var profileName: String = ""
+    private var profileName: String = ""
+    private var userEmail: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -54,15 +55,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         var userServer= User.shared
-        userServer.getName { name ->
-            if (name != null) {
-                profileName = name
+        userServer.getUser { user ->
+            if (user != null) {
+                profileName = user["name"].toString()
+                userEmail = user["email"].toString()
             }
         }
 
     }
     fun getUserName(): String {
         return profileName;
+    }
+    fun getUserEmail(): String {
+        return userEmail;
     }
 
 // CHECK
