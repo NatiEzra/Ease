@@ -5,8 +5,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
 import com.example.ease.model.AuthRepository
+import com.example.ease.model.Model
 import com.example.ease.model.User
 
 // TODO: Rename parameter arguments, choose names that match
@@ -39,11 +41,33 @@ class addPostFragment : Fragment() {
         // Inflate the layout for this fragment
         var view= inflater.inflate(R.layout.fragment_add_post, container, false)
         var profileName=view.findViewById<TextView>(R.id.profileName)
+        var postText=view.findViewById<EditText>(R.id.addPostEditText)
+        var postButton=view.findViewById<TextView>(R.id.postButton)
+        var userServer= User.shared
         profileName.text = (activity as? MainActivity)?.getUserName()
+        var email = (activity as? MainActivity)?.getUserEmail().toString()
+
+        postButton.setOnClickListener {
+
+
+            var postTextString=postText.text.toString()
+            if(postTextString.isNotEmpty()){
+                Model.shared.addPost(email,postTextString){ success, error ->
+                    if (success) {
+                        postText.text.clear()
+                    } else {
+                        // Handle the error
+                    }
+                }
+                postText.text.clear()
+            }
+        }
 
 
         return view;
     }
+
+
 
     companion object {
         /**

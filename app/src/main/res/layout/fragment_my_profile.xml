@@ -45,16 +45,16 @@
             android:textSize="16sp"
             android:textColor="?android:textColorSecondary" />
 
+        <!-- אימייל -->
         <EditText
             android:id="@+id/profileName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Name"
+            android:layout_marginBottom="16dp"
             android:background="?android:attr/editTextBackground"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp" />
+            android:hint="Name"
+            android:padding="12dp" />
 
-        <!-- אימייל -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
