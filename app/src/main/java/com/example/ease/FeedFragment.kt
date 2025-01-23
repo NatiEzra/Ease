@@ -54,9 +54,12 @@ class PostsViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
 
 }
 
-class PostRecycleAdapter(private val posts : List<Post>?): RecyclerView.Adapter<PostsViewHolder>() {
+class PostRecycleAdapter(private var posts : List<Post>?): RecyclerView.Adapter<PostsViewHolder>() {
     override fun getItemCount(): Int {
         return posts?.size ?: 0
+    }
+    fun set(_posts: List<Post>) {
+        posts = _posts
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostsViewHolder {
@@ -97,25 +100,26 @@ class FeedFragment : Fragment() {
         adapter = PostRecycleAdapter(posts)
         recyclerView.adapter = adapter
 
-        Model.shared.posts.observe(viewLifecycleOwner) { updatedPosts ->
-            adapter = PostRecycleAdapter(updatedPosts)
-            recyclerView.adapter = adapter
-        }
-
-        // Trigger data loading
-        lifecycleScope.launch {
-            Model.shared.fetchPosts()
-        }
+        getAllPosts()
         return view
     }
 
-    private suspend fun loadPosts() {
-        val retrievedPosts = withContext(Dispatchers.IO) {
-            Model.shared.getPosts()
+    override fun onResume() {
+        super.onResume()
+        getAllPosts()
+
+    }
+
+    private fun getAllPosts() {
+
+        Model.shared.getPosts { fetchedPosts ->
+            // Ensure posts are updated only after fetching data from the database
+            posts.clear()
+            posts.addAll(fetchedPosts)
+
+            adapter?.set(posts)
+            adapter?.notifyDataSetChanged()
         }
-        posts.clear()
-        posts.addAll(retrievedPosts)
-        adapter?.notifyDataSetChanged()
-        (activity as? MainActivity)?.showLoading(false)
+
     }
 }
