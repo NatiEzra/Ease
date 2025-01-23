@@ -3,6 +3,12 @@ package com.example.ease.model
 import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 
 data class Post(
@@ -16,16 +22,17 @@ data class Post(
 
 class Model  private constructor(){
     val db= Firebase.firestore
-    @Volatile
-    var posts: MutableList<Post> = mutableListOf()
+    private val _posts = MutableStateFlow<List<Post>>(emptyList())
+    val posts: StateFlow<List<Post>> = _posts
 
     companion object{
         val shared =Model()
     }
-    init {
-        getPosts { retrievedPosts ->
-            posts = retrievedPosts
+    /*init {
+        CoroutineScope(Dispatchers.Main).launch {
+            posts=getPosts()
         }
+*/
         /*
         var postsSize=posts.size
         for (i  in 0..5){
@@ -34,6 +41,22 @@ class Model  private constructor(){
         }*/
 
 
+    suspend fun fetchPosts() {
+        try {
+            val documents = db.collection("posts").get().await()
+            val fetchedPosts = documents.map { document ->
+                Post(
+                    postId = document.id,
+                    profileName = document.getString("email") ?: "Unknown",
+                    ProfileImage = "image",
+                    textPost = document.getString("postText") ?: "No Content",
+                    imagePost = "image"
+                )
+            }
+            _posts.value = fetchedPosts // Update StateFlow
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error fetching posts", e)
+        }
     }
     fun addPost(email: String,postText: String, onComplete: (Boolean, String?) -> Unit) {
         val post = hashMapOf(
@@ -50,27 +73,25 @@ class Model  private constructor(){
                 onComplete(false, e.localizedMessage)
             }
     }
-    fun getPosts(onComplete: (MutableList<Post>) -> Unit) {
-        db.collection("posts")
-            .get()
-            .addOnSuccessListener { documents ->
-                val posts : MutableList<Post> = mutableListOf()
-                for (document in documents) {
-                    val post = Post(
-                        postId=document.id,
-                        profileName = document.getString("email") ?: "name",
-                        ProfileImage = "image",
-                        textPost = document.getString("postText") ?: "post",
-                        imagePost = "image"
-                    )
-                    posts.add(post)
-                }
-                Log.d("Firestore", "Successfully fetched ${posts.size} posts.")
-                onComplete(posts)
+    suspend fun getPosts(): MutableList<Post> {
+        return try {
+            val documents = db.collection("posts").get().await()
+            val posts: MutableList<Post> = mutableListOf()
+            for (document in documents) {
+                val post = Post(
+                    postId = document.id,
+                    profileName = document.getString("email") ?: "name",
+                    ProfileImage = "image",
+                    textPost = document.getString("postText") ?: "post",
+                    imagePost = "image"
+                )
+                posts.add(post)
             }
-            .addOnFailureListener { e ->
-                Log.e("Firestore", "Error fetching posts", e)
-                onComplete(mutableListOf()) // Return an empty list on failure
-                }
-            }
+            Log.d("Firestore", "Successfully fetched ${posts.size} posts.")
+            posts
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error fetching posts", e)
+            mutableListOf() // Return an empty list on failure
+        }
+    }
 }

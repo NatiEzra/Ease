@@ -9,10 +9,15 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ease.model.Model
 import com.example.ease.model.Post
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PostsViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
     var profileNameTextView: TextView? = null
@@ -84,15 +89,17 @@ class FeedFragment : Fragment() {
     ): View? {
         var view = inflater.inflate(R.layout.fragment_feed, container, false)
 
-        posts = Model.shared.posts
+
         val recyclerView: RecyclerView = view.findViewById(R.id.fragment_feed_recycler_view)
         recyclerView.setHasFixedSize(true)
+
 
         val layoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = layoutManager
 
         adapter = PostRecycleAdapter(posts)
         recyclerView.adapter = adapter
+
         getAllPosts()
         return view
     }
@@ -113,5 +120,6 @@ class FeedFragment : Fragment() {
             adapter?.set(posts)
             adapter?.notifyDataSetChanged()
         }
+
     }
 }
