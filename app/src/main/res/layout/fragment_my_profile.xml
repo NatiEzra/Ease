@@ -72,50 +72,21 @@
             android:layout_marginBottom="16dp" />
 
         <!-- תאריך לידה -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Date of Birth"
-            android:textSize="16sp"
-            android:textColor="?android:textColorSecondary" />
-
-        <EditText
-            android:id="@+id/profileDateOfBirth"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Date of birth"
-            android:background="?android:attr/editTextBackground"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp" />
 
         <!-- מגדר -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Gender"
-            android:textSize="16sp"
-            android:textColor="?android:textColorSecondary" />
-
-        <EditText
-            android:id="@+id/profileGender"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Gender"
-            android:background="?android:attr/editTextBackground"
-            android:padding="12dp"
-            android:layout_marginBottom="24dp" />
 
         <!-- כפתור Logout -->
         <Button
             android:id="@+id/logoutButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Log Out"
+            android:layout_marginTop="52dp"
+            android:layout_marginBottom="16dp"
             android:backgroundTint="#FADBD8"
-            android:textColor="#C0392B"
             android:drawableLeft="@drawable/logout"
             android:drawablePadding="8dp"
-            android:layout_marginBottom="16dp" />
+            android:text="Log Out"
+            android:textColor="#C0392B" />
 
         <!-- כפתור Edit -->
         <Button
