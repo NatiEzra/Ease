@@ -13,16 +13,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ease.model.Model
 import com.example.ease.model.Post
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PostsViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
     var profileNameTextView: TextView? = null
     var postTextView: TextView? = null
     var imageProfile: ImageView? = null
+    var dateTextView: TextView? = null
+
 
 
     init {
         profileNameTextView = itemView.findViewById(R.id.profileName)
         postTextView = itemView.findViewById(R.id.textPost)
+        dateTextView = itemView.findViewById(R.id.postDate)
 
     }
     /*itemView.setOnClickListener{
@@ -43,8 +48,10 @@ class PostsViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
 
 
     fun bind(post: Post) {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
         profileNameTextView?.text = post.profileName
         postTextView?.text = post.textPost
+        dateTextView?.text = dateFormat.format(post.date)
     }
 
 }

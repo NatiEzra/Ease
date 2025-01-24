@@ -48,4 +48,22 @@ class User{
             onComplete(null)
         }
     }
+    fun getUserByEmail(email: String, onComplete: (String) -> Unit) {
+        db.collection("users")
+            .whereEqualTo("email", email)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    val userDocument = documents.documents[0]
+                    val username = userDocument.data?.get("name")
+                    onComplete(username.toString())
+                } else {
+                    onComplete("user-not-found")
+
+                }
+            }
+            .addOnFailureListener { e ->
+
+            }
+    }
 }
