@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import com.example.ease.model.AuthRepository
 import com.example.ease.model.Model
 import com.example.ease.model.User
@@ -55,11 +56,19 @@ class addPostFragment : Fragment() {
                 Model.shared.addPost(email,postTextString){ success, error ->
                     if (success) {
                         postText.text.clear()
+                        Toast.makeText(context,"Your post was shared successfully!",Toast.LENGTH_LONG).show()
+                        (activity as? MainActivity)?.homePageButtonClicked()
+
                     } else {
                         // Handle the error
+                        Toast.makeText(context,"Connection failed",Toast.LENGTH_LONG).show()
+
                     }
                 }
                 postText.text.clear()
+            }
+            else{
+                Toast.makeText(context,"Post empty is invalid",Toast.LENGTH_LONG).show()
             }
         }
 

@@ -59,6 +59,12 @@ class MainActivity : AppCompatActivity() {
             homePageButtonClicked()
         }
 
+        val profilePageButton=findViewById<ImageView>(R.id.profile_icon)
+        profilePageButton.setOnClickListener{
+            myProfilePageButtonClicked()
+        }
+
+
         var userServer= User.shared
         userServer.getUser { user ->
             if (user != null) {
@@ -96,6 +102,26 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+    }
+    fun myProfilePageButtonClicked() {
+
+        supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+
+        // Replace the register fragment with the login fragment
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_container, myProfileFragment())
+            commit()
+        }
+
+
+    }
+
+    fun editProfileButtonClicked(){
+        supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_container, editProfileFragment())
+            commit()
+        }
     }
 
     private fun replaceFragment(fragment: Fragment) {

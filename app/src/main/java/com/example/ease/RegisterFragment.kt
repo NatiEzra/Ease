@@ -81,6 +81,10 @@ class RegisterFragment : Fragment() {
                 Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || username.isEmpty()) {
+                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             authServer.registerUser(email, password) { success, error ->
                 if (success) {
                     userServer.createUser(username,email){success,error->
