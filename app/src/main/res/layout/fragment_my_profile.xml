@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:colorBackground"
+    android:background="#FFFFFF"
     android:layoutDirection="ltr"
     tools:context=".ProfileFragment">
 
@@ -23,7 +23,7 @@
             android:text="My Profile"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="?android:textColorPrimary"
+            android:textColor="#000000"
             android:gravity="center"
             android:layout_marginBottom="16dp" />
 
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:text="Name"
             android:textSize="16sp"
-            android:textColor="?android:textColorSecondary" />
+            android:textColor="#000000" />
 
         <!-- אימייל -->
         <EditText
@@ -51,7 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="?android:attr/editTextBackground"
+
             android:hint="Name"
             android:padding="12dp" />
 
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:text="Email"
             android:textSize="16sp"
-            android:textColor="?android:textColorSecondary" />
+            android:textColor="#000000" />
 
         <EditText
             android:id="@+id/profileEmail"

@@ -1,5 +1,6 @@
 package com.example.ease.model
 
+import android.graphics.Bitmap
 import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -22,6 +23,7 @@ class Model  private constructor(){
     @Volatile
     var posts: MutableList<Post> = mutableListOf()
     var userServer= User.shared
+    val cloudinaryModel= CloudinaryModel()
 
     companion object{
         val shared =Model()
@@ -39,7 +41,7 @@ class Model  private constructor(){
 
 
     }
-    fun addPost(email: String,postText: String, onComplete: (Boolean, String?) -> Unit) {
+    fun addPost(email: String, image: Bitmap?, postText: String, onComplete: (Boolean, String?) -> Unit) {
         val post = hashMapOf(
             "email" to email,
             "postText" to postText,
@@ -54,6 +56,9 @@ class Model  private constructor(){
             .addOnFailureListener { e ->
                 onComplete(false, e.localizedMessage)
             }
+    }
+    fun uploadImageToCloudinary(bitmap: Bitmap, name : String, onSuccess: (String?) -> Unit, onError: (String?) -> Unit) {
+        cloudinaryModel.uploadImage(bitmap, name, onSuccess, onError)
     }
     fun getPosts(onComplete: (MutableList<Post>) -> Unit) {
 

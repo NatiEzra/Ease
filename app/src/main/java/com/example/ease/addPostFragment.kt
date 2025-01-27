@@ -53,7 +53,7 @@ class addPostFragment : Fragment() {
 
             var postTextString=postText.text.toString()
             if(postTextString.isNotEmpty()){
-                Model.shared.addPost(email,postTextString){ success, error ->
+                Model.shared.addPost(email,null ,postTextString){ success, error ->
                     if (success) {
                         postText.text.clear()
                         Toast.makeText(context,"Your post was shared successfully!",Toast.LENGTH_LONG).show()
