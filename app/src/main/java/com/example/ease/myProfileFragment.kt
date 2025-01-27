@@ -34,7 +34,7 @@ class myProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
+        // Inflate the layout for this fragment and check if the edit button is clicked
         val view= inflater.inflate(R.layout.fragment_my_profile, container, false)
         val editButton: TextView = view.findViewById(R.id.editButton)
         editButton.setOnClickListener {
