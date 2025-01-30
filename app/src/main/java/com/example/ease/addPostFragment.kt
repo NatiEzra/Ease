@@ -1,13 +1,17 @@
 package com.example.ease
 
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import com.example.ease.model.AuthRepository
 import com.example.ease.model.Model
 import com.example.ease.model.User
@@ -26,6 +30,9 @@ class addPostFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+
+
+    private var cameraLauncher: ActivityResultLauncher<Void?>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,30 +54,63 @@ class addPostFragment : Fragment() {
         var userServer= User.shared
         profileName.text = (activity as? MainActivity)?.getUserName()
         var email = (activity as? MainActivity)?.getUserEmail().toString()
+        var addMediaButton=view.findViewById<TextView>(R.id.addMediaButton)
+        var postImage=view.findViewById<ImageView>(R.id.postImage)
+        var addedImageToPost: Boolean = false
 
         postButton.setOnClickListener {
 
 
             var postTextString=postText.text.toString()
             if(postTextString.isNotEmpty()){
-                Model.shared.addPost(email,null ,postTextString){ success, error ->
-                    if (success) {
-                        postText.text.clear()
-                        Toast.makeText(context,"Your post was shared successfully!",Toast.LENGTH_LONG).show()
-                        (activity as? MainActivity)?.homePageButtonClicked()
+                if (addedImageToPost){
+                    postImage.isDrawingCacheEnabled = true
+                    postImage.buildDrawingCache()
+                    val bitmap = (postImage.drawable as BitmapDrawable).bitmap
+                    Model.shared.addPost(email,bitmap ,postTextString){ success, error ->
+                        if (success) {
+                            postText.text.clear()
+                            Toast.makeText(context,"Your post was shared successfully!",Toast.LENGTH_LONG).show()
+                            (activity as? MainActivity)?.homePageButtonClicked()
 
-                    } else {
-                        // Handle the error
-                        Toast.makeText(context,"Connection failed",Toast.LENGTH_LONG).show()
+                        } else {
+                            // Handle the error
+                            Toast.makeText(context,"Connection failed",Toast.LENGTH_LONG).show()
 
+                        }
                     }
+                    postText.text.clear()
                 }
-                postText.text.clear()
+                else{
+                    Model.shared.addPost(email,null ,postTextString){ success, error ->
+                        if (success) {
+                            postText.text.clear()
+                            Toast.makeText(context,"Your post was shared successfully!",Toast.LENGTH_LONG).show()
+                            (activity as? MainActivity)?.homePageButtonClicked()
+
+                        } else {
+                            // Handle the error
+                            Toast.makeText(context,"Connection failed",Toast.LENGTH_LONG).show()
+
+                        }
+                    }
+                    postText.text.clear()
+                }
+
             }
             else{
                 Toast.makeText(context,"Post empty is invalid",Toast.LENGTH_LONG).show()
             }
         }
+        cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+            postImage.setImageBitmap(bitmap)
+            //binding?.imageView?.setImageBitmap(bitmap)
+            addedImageToPost = true
+        }
+        addMediaButton.setOnClickListener(){
+            cameraLauncher?.launch(null)
+        }
+
 
 
         return view;

@@ -16,12 +16,12 @@ class LoginRegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
-            /*if (authServer.isUserLoggedIn()) {
+            if (authServer.isUserLoggedIn()) {
                 navigateToHome()
                 return
             }
 
-             */
+
             enableEdgeToEdge()
             setContentView(R.layout.activity_login_register)
             ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->

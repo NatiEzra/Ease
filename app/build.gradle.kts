@@ -18,6 +18,8 @@ android {
     }
 
 
+
+
     defaultConfig {
         applicationId = "com.example.ease"
         minSdk = 26
@@ -25,7 +27,12 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "CLOUD_NAME", "\"${project.properties["CLOUD_NAME"] ?: ""}\"")
+        buildConfigField("String", "API_KEY", "\"${project.properties["API_KEY"] ?: ""}\"")
+        buildConfigField("String", "API_SECRET", "\"${project.properties["API_SECRET"] ?: ""}\"")
         buildConfigField("String", "GOOGLE_CLIENT_ID", secretsProperties["GOOGLE_CLIENT_ID"] as String)
+
     }
 
     buildTypes {

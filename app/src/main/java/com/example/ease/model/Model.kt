@@ -45,15 +45,37 @@ class Model  private constructor(){
         val post = hashMapOf(
             "email" to email,
             "postText" to postText,
-            "date" to System.currentTimeMillis()
+            "date" to System.currentTimeMillis(),
+            "imagePost" to ""
         )
 
         db.collection("posts")
             .add(post)
             .addOnSuccessListener { documentReference ->
-                onComplete(true, null)
+                image?.let {
+                    Log.d("Firestore", "Image upload started ofek")
+                    uploadImageToCloudinary(it, documentReference.id, { uri ->
+                        Log.d("Firestore", "Image upload completed ofek")
+                        if (!uri.isNullOrBlank()) {
+                            db.collection("posts").document(documentReference.id)
+                                .update("imagePost", uri)
+                                .addOnSuccessListener {
+                                    onComplete(true, null)
+                                }
+                                .addOnFailureListener { e ->
+                                    onComplete(false, e.localizedMessage)
+                                }
+                        } else {
+                            Log.d("Firestore", "Image upload failed -ofek")
+                            onComplete(false, "Image upload failed")
+                        }
+                    }, { error ->
+                        onComplete(false, error)
+                    })
+                } ?: onComplete(true, null)
             }
             .addOnFailureListener { e ->
+                Log.e("Firestore", "Error adding post ofek", e)
                 onComplete(false, e.localizedMessage)
             }
     }
