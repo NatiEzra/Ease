@@ -7,8 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.ease.model.Model
+import com.example.ease.model.User
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -46,6 +49,7 @@ class editProfileFragment : Fragment() {
         var profileImage = view.findViewById<ImageView>(R.id.profileImage)
         var addedImageToProfile: Boolean = false
         var saveButton = view.findViewById<ImageView>(R.id.saveButton)
+        var userServer= User.shared
             cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
             profileImage.setImageBitmap(bitmap)
             //binding?.imageView?.setImageBitmap(bitmap)
@@ -60,6 +64,17 @@ class editProfileFragment : Fragment() {
                 profileImage.isDrawingCacheEnabled = true
                 profileImage.buildDrawingCache()
                 val bitmap = (profileImage.drawable as BitmapDrawable).bitmap
+                userServer.editUser(bitmap) { success, error ->
+                    if (success) {
+                        Toast.makeText(context, "Profile image updated", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Error: $error", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+
+            }
+            else{
 
             }
         }
