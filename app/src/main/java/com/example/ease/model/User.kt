@@ -1,5 +1,7 @@
 package com.example.ease.model
 
+import android.graphics.Bitmap
+import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -10,7 +12,7 @@ class User{
     }
 
     val db = Firebase.firestore
-
+    val cloudinaryModel= CloudinaryModel()
     fun createUser(name: String, email: String, onComplete: (Boolean, String?) -> Unit) {
         val user = hashMapOf(
             "name" to name,
@@ -66,4 +68,32 @@ class User{
 
             }
     }
+    fun editUser(image: Bitmap?, onComplete: (Boolean, String?) -> Unit) {
+        val user = hashMapOf(
+            "image" to image
+        )
+        if (image!=null){
+        uploadImageToCloudinary(image, auth.getCurrentUserEmail(), { uri ->
+            Log.d("Firestore", "Image upload completed ofek")
+            if (!uri.isNullOrBlank()) {
+                db.collection( "users").document(auth.currentUser?.email.toString())
+                    .update("image", uri)
+                    .addOnSuccessListener {
+                        onComplete(true, null)
+                    }
+                    .addOnFailureListener { e ->
+                        onComplete(false, e.localizedMessage)
+                    }
+            }
+        }, { error ->
+            onComplete(false, error)
+        })
+      }
+
+
 }
+    fun uploadImageToCloudinary(bitmap: Bitmap, name : String, onSuccess: (String?) -> Unit, onError: (String?) -> Unit) {
+        cloudinaryModel.uploadImage(bitmap, name, onSuccess, onError)
+    }
+}
+

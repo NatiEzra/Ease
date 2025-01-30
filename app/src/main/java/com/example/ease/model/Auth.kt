@@ -39,5 +39,15 @@ class AuthRepository {
     }
 
     fun isUserLoggedIn(): Boolean = currentUser != null
+    fun getCurrentUserEmail(): String {
+        val email: String
+        if(currentUser!=null){
+            email= currentUser!!.email.toString()
+        }
+        else{
+            email=""
+        }
+        return email
+    }
 }
 

@@ -1,15 +1,22 @@
 package com.example.ease
 
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
+
+
+private var cameraLauncher: ActivityResultLauncher<Void?>? = null
 
 /**
  * A simple [Fragment] subclass.
@@ -34,7 +41,29 @@ class editProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_edit_profile, container, false)
+        var view= inflater.inflate(R.layout.fragment_edit_profile, container, false)
+        var editIcon = view.findViewById<ImageView>(R.id.editIcon)
+        var profileImage = view.findViewById<ImageView>(R.id.profileImage)
+        var addedImageToProfile: Boolean = false
+        var saveButton = view.findViewById<ImageView>(R.id.saveButton)
+            cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+            profileImage.setImageBitmap(bitmap)
+            //binding?.imageView?.setImageBitmap(bitmap)
+            addedImageToProfile = true
+        }
+        editIcon.setOnClickListener {
+            cameraLauncher?.launch(null)
+        }
+
+        saveButton.setOnClickListener {
+            if (addedImageToProfile) {
+                profileImage.isDrawingCacheEnabled = true
+                profileImage.buildDrawingCache()
+                val bitmap = (profileImage.drawable as BitmapDrawable).bitmap
+
+            }
+        }
+        return view
     }
 
     companion object {
