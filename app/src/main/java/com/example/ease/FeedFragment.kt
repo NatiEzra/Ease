@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ease.model.Model
 import com.example.ease.model.Post
+import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -21,6 +22,7 @@ class PostsViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
     var postTextView: TextView? = null
     var imageProfile: ImageView? = null
     var dateTextView: TextView? = null
+    var imagePost: ImageView? = null
 
 
 
@@ -28,6 +30,7 @@ class PostsViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
         profileNameTextView = itemView.findViewById(R.id.profileName)
         postTextView = itemView.findViewById(R.id.textPost)
         dateTextView = itemView.findViewById(R.id.postDate)
+        imagePost = itemView.findViewById(R.id.imagePost)
 
     }
     /*itemView.setOnClickListener{
@@ -52,6 +55,23 @@ class PostsViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
         profileNameTextView?.text = post.profileName
         postTextView?.text = post.textPost
         dateTextView?.text = dateFormat.format(post.date)
+
+        if (imagePost != null) {
+            try {
+                imagePost?.visibility = View.VISIBLE
+                Picasso.get().load(post.imagePost).into(imagePost)
+            } catch (e: Exception) {
+                imagePost?.visibility = View.GONE
+                e.printStackTrace()
+                // Handle the error, e.g., set a placeholder image
+                //imagePost!!.setImageResource(R.drawable.image)
+            }
+        }
+        //val resourceId = itemView.context.resources.getIdentifier(post.imagePost, "drawable", itemView.context.packageName)
+        //imagePost?.setImageResource(resourceId)
+
+
+
     }
 
 }

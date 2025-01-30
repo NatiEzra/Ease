@@ -106,7 +106,7 @@ class Model  private constructor(){
                             profileName = username,
                             ProfileImage = "image",
                             textPost = document.getString("postText") ?: "post",
-                            imagePost = "image",
+                            imagePost = document.getString("imagePost") ?: "",
                             date = java.util.Date(document.getLong("date") ?: 0)
                         )
                         posts.add(post)
