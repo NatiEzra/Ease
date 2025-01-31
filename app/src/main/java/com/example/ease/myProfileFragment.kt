@@ -5,7 +5,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import com.example.ease.model.User
+import com.squareup.picasso.Picasso
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -35,11 +38,20 @@ class myProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment and check if the edit button is clicked
-        val view= inflater.inflate(R.layout.fragment_my_profile, container, false)
+        val view = inflater.inflate(R.layout.fragment_my_profile, container, false)
         val editButton: TextView = view.findViewById(R.id.editButton)
         editButton.setOnClickListener {
             (activity as? MainActivity)?.editProfileButtonClicked()
         }
+        val profileImage = view.findViewById<ImageView>(R.id.profileImage)
+        val userServer = User.shared
+        userServer.getProfileImage { uri ->
+            if (uri != null) {
+                Picasso.get().load(uri).into(profileImage)
+            }
+        }
+
+
 
 
         return view

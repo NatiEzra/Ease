@@ -6,10 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.collection.emptyLongSet
 import com.example.ease.model.Model
 import com.example.ease.model.User
 
@@ -48,12 +50,15 @@ class editProfileFragment : Fragment() {
         var editIcon = view.findViewById<ImageView>(R.id.editIcon)
         var profileImage = view.findViewById<ImageView>(R.id.profileImage)
         var addedImageToProfile: Boolean = false
-        var saveButton = view.findViewById<ImageView>(R.id.saveButton)
+        var saveButton = view.findViewById<Button>(R.id.saveButton)
         var userServer= User.shared
-            cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-            profileImage.setImageBitmap(bitmap)
+        cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
             //binding?.imageView?.setImageBitmap(bitmap)
-            addedImageToProfile = true
+            if(bitmap!=null){
+                profileImage.setImageBitmap(bitmap)
+                addedImageToProfile = true
+            }
+
         }
         editIcon.setOnClickListener {
             cameraLauncher?.launch(null)
@@ -78,6 +83,10 @@ class editProfileFragment : Fragment() {
 
             }
         }
+
+
+
+
         return view
     }
 

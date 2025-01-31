@@ -14,6 +14,9 @@ import java.io.FileOutputStream
 
 
 class CloudinaryModel {
+    companion object {
+        private var isInitialized = false
+    }
 
     init{
         val config= mapOf(
@@ -22,8 +25,11 @@ class CloudinaryModel {
             "api_secret" to com.example.ease.BuildConfig.API_SECRET
         )
         MyApplication.Globals.context?.let {
-            MediaManager.init(it, config)
-            MediaManager.get().globalUploadPolicy=GlobalUploadPolicy.defaultPolicy()
+            if (!isInitialized) {
+                MediaManager.init(it, config)
+                MediaManager.get().globalUploadPolicy = GlobalUploadPolicy.defaultPolicy()
+                isInitialized = true
+            }
         }
     }
     fun uploadImage(bitmap: Bitmap, name : String, onSuccess: (String?) -> Unit, onError: (String?) -> Unit){
