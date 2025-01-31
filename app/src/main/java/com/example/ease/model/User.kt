@@ -53,22 +53,21 @@ class User {
         }
     }
 
-    fun getUserByEmail(email: String, onComplete: (String) -> Unit) {
+    fun getUserByEmail(email: String, onComplete: (Map<String, Any>?) -> Unit) {
         db.collection("users")
             .whereEqualTo("email", email)
             .get()
             .addOnSuccessListener { documents ->
                 if (!documents.isEmpty) {
                     val userDocument = documents.documents[0]
-                    val username = userDocument.data?.get("name")
-                    onComplete(username.toString())
+                    val userData = userDocument.data
+                    onComplete(userData)
                 } else {
-                    onComplete("user-not-found")
-
+                    onComplete(null)
                 }
             }
             .addOnFailureListener { e ->
-
+                onComplete(null)
             }
     }
     fun getProfileImage(onComplete: (String?) -> Unit) {
@@ -94,20 +93,47 @@ class User {
                         val documentReference = userDocument.reference
 
                         if (image != null) {
-                            uploadImageToCloudinary(image, auth.getCurrentUserEmail(), { uri ->
-                                Log.d("Firestore", "Image upload completed")
-                                if (!uri.isNullOrBlank()) {
-                                    documentReference.update("image", uri)
-                                        .addOnSuccessListener {
-                                            onComplete(true, null)
-                                        }
-                                        .addOnFailureListener { e ->
-                                            onComplete(false, e.localizedMessage)
-                                        }
+                            // Delete the previous profile image
+                            val previousImageUrl = userDocument.getString("image")
+                            if (!previousImageUrl.isNullOrEmpty()) {
+                                cloudinaryModel.deleteImage(previousImageUrl) { deleteSuccess, deleteError ->
+                                    if (deleteSuccess) {
+                                        // Upload the new profile image
+                                        uploadImageToCloudinary(image, auth.getCurrentUserEmail(), { uri ->
+                                            Log.d("Firestore", "Image upload completed")
+                                            if (!uri.isNullOrBlank()) {
+                                                documentReference.update("image", uri)
+                                                    .addOnSuccessListener {
+                                                        onComplete(true, null)
+                                                    }
+                                                    .addOnFailureListener { e ->
+                                                        onComplete(false, e.localizedMessage)
+                                                    }
+                                            }
+                                        }, { error ->
+                                            onComplete(false, error)
+                                        })
+                                    } else {
+                                        onComplete(false, deleteError)
+                                    }
                                 }
-                            }, { error ->
-                                onComplete(false, error)
-                            })
+                            } else {
+                                // Upload the new profile image if there is no previous image
+                                uploadImageToCloudinary(image, auth.getCurrentUserEmail(), { uri ->
+                                    Log.d("Firestore", "Image upload completed")
+                                    if (!uri.isNullOrBlank()) {
+                                        documentReference.update("image", uri)
+                                            .addOnSuccessListener {
+                                                onComplete(true, null)
+                                            }
+                                            .addOnFailureListener { e ->
+                                                onComplete(false, e.localizedMessage)
+                                            }
+                                    }
+                                }, { error ->
+                                    onComplete(false, error)
+                                })
+                            }
                         } else {
                             onComplete(false, "Image is null")
                         }

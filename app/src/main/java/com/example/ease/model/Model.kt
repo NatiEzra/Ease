@@ -1,6 +1,7 @@
 package com.example.ease.model
 
 import android.graphics.Bitmap
+import android.provider.ContactsContract.Profile
 import android.util.Log
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -100,11 +101,11 @@ class Model  private constructor(){
                 }
                 for (document in documents) {
                     val email = document.getString("email") ?: "email"
-                    userServer.getUserByEmail(email) { username ->
+                    userServer.getUserByEmail(email) { user ->
                         val post = Post(
                             postId = document.id,
-                            profileName = username,
-                            ProfileImage = "image",
+                            profileName = user?.get("name") as? String ?: "name",
+                            ProfileImage=user?.get("image") as? String ?: "image",
                             textPost = document.getString("postText") ?: "post",
                             imagePost = document.getString("imagePost") ?: "",
                             date = java.util.Date(document.getLong("date") ?: 0)

@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.collection.emptyLongSet
 import com.example.ease.model.Model
 import com.example.ease.model.User
+import com.squareup.picasso.Picasso
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -101,6 +102,12 @@ class editProfileFragment : Fragment() {
 
             }
 
+        }
+
+        userServer.getProfileImage { uri ->
+            if (uri != null) {
+                Picasso.get().load(uri).into(profileImage)
+            }
         }
 
 

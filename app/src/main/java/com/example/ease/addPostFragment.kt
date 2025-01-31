@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.example.ease.model.AuthRepository
 import com.example.ease.model.Model
 import com.example.ease.model.User
+import com.squareup.picasso.Picasso
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -58,6 +59,7 @@ class addPostFragment : Fragment() {
         var email = (activity as? MainActivity)?.getUserEmail().toString()
         var addMediaButton=view.findViewById<TextView>(R.id.addMediaButton)
         var postImage=view.findViewById<ImageView>(R.id.postImage)
+        var profileImage=view.findViewById<ImageView>(R.id.profileImage)
         var addedImageToPost: Boolean = false
 
         postButton.setOnClickListener {
@@ -132,7 +134,11 @@ class addPostFragment : Fragment() {
             builder.show()
         }
 
-
+        userServer.getProfileImage { uri ->
+            if (uri != null) {
+                Picasso.get().load(uri).into(profileImage)
+            }
+        }
 
         return view;
     }
