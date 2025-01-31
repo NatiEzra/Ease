@@ -69,6 +69,8 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation (libs.cloudinary.android)
     implementation (libs.picasso)
+    implementation(libs.wasabeef.picasso.transformations)
+
 
 
 }

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.ease.model.Model
 import com.example.ease.model.Post
 import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -26,11 +27,13 @@ class PostsViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
 
 
 
+
     init {
         profileNameTextView = itemView.findViewById(R.id.profileName)
         postTextView = itemView.findViewById(R.id.textPost)
         dateTextView = itemView.findViewById(R.id.postDate)
         imagePost = itemView.findViewById(R.id.imagePost)
+        imageProfile = itemView.findViewById(R.id.ProfileImage)
 
     }
     /*itemView.setOnClickListener{
@@ -55,6 +58,20 @@ class PostsViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
         profileNameTextView?.text = post.profileName
         postTextView?.text = post.textPost
         dateTextView?.text = dateFormat.format(post.date)
+
+       // Picasso.get().load(uri).into(profileImage)
+        if(post.ProfileImage != "image") {
+            try {
+                Picasso.get()
+                    .load(post.ProfileImage)
+                    .transform(CropCircleTransformation())
+                    .into(imageProfile)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // Handle the error, e.g., set a placeholder image
+                //imagePost!!.setImageResource(R.drawable.image)
+            }
+        }
 
         if (imagePost != null) {
             try {
