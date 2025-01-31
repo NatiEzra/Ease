@@ -1,5 +1,6 @@
 package com.example.ease
 
+import android.app.AlertDialog
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -33,6 +34,7 @@ class addPostFragment : Fragment() {
 
 
     private var cameraLauncher: ActivityResultLauncher<Void?>? = null
+    private var galleryLauncher: ActivityResultLauncher<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,12 +105,31 @@ class addPostFragment : Fragment() {
             }
         }
         cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-            postImage.setImageBitmap(bitmap)
+            if(bitmap!=null) {
+                postImage.setImageBitmap(bitmap)
+                addedImageToPost = true
+            }
             //binding?.imageView?.setImageBitmap(bitmap)
-            addedImageToPost = true
         }
+        galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri != null) {
+                postImage.setImageURI(uri)
+                addedImageToPost = true
+            }
+        }
+
         addMediaButton.setOnClickListener(){
-            cameraLauncher?.launch(null)
+            val options = arrayOf("Take Photo", "Choose from Gallery")
+            val customTitle = layoutInflater.inflate(R.layout.dialog_title, null)
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setCustomTitle(customTitle)
+            builder.setItems(options) { dialog, which ->
+                when (which) {
+                    0 -> cameraLauncher?.launch(null)
+                    1 -> galleryLauncher?.launch("image/*")
+                }
+            }
+            builder.show()
         }
 
 
