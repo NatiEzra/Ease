@@ -1,5 +1,6 @@
 package com.example.ease
 
+import android.app.AlertDialog
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -22,6 +23,8 @@ private const val ARG_PARAM2 = "param2"
 
 
 private var cameraLauncher: ActivityResultLauncher<Void?>? = null
+private var galleryLauncher: ActivityResultLauncher<String>? = null
+
 
 /**
  * A simple [Fragment] subclass.
@@ -60,8 +63,26 @@ class editProfileFragment : Fragment() {
             }
 
         }
+
+        galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri != null) {
+                profileImage.setImageURI(uri)
+                addedImageToProfile = true
+            }
+        }
+
         editIcon.setOnClickListener {
-            cameraLauncher?.launch(null)
+            val options = arrayOf("Take Photo", "Choose from Gallery")
+            val customTitle = layoutInflater.inflate(R.layout.dialog_title, null)
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setCustomTitle(customTitle)
+            builder.setItems(options) { dialog, which ->
+                when (which) {
+                    0 -> cameraLauncher?.launch(null)
+                    1 -> galleryLauncher?.launch("image/*")
+                }
+            }
+            builder.show()
         }
 
         saveButton.setOnClickListener {
@@ -79,9 +100,7 @@ class editProfileFragment : Fragment() {
 
 
             }
-            else{
 
-            }
         }
 
 
