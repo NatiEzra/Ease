@@ -1,0 +1,187 @@
+package com.example.ease
+
+import android.app.AlertDialog
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.CheckBox
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.ease.model.Model
+import com.example.ease.model.Post
+import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
+import java.text.SimpleDateFormat
+import java.util.Locale
+import com.example.ease.FeedFragment
+import com.example.ease.base.MyApplication.Globals.context
+
+class MyPostsViewHolder (itemView: View, private val onEditClick: (String) -> Unit): RecyclerView.ViewHolder(itemView) {
+    var profileNameTextView: TextView? = null
+    var postTextView: TextView? = null
+    var imageProfile: ImageView? = null
+    var dateTextView: TextView? = null
+    var imagePost: ImageView? = null
+    var editButton: ImageView? = null
+    var deleteButton: ImageView? = null
+
+
+
+
+    init {
+        profileNameTextView = itemView.findViewById(R.id.profileName)
+        postTextView = itemView.findViewById(R.id.textPost)
+        dateTextView = itemView.findViewById(R.id.postDate)
+        imagePost = itemView.findViewById(R.id.imagePost)
+        imageProfile = itemView.findViewById(R.id.ProfileImage)
+        editButton=itemView.findViewById(R.id.editPostIcon)
+        deleteButton=itemView.findViewById(R.id.deletePostIcon)
+
+    }
+    fun bind(post: Post) {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+        profileNameTextView?.text = post.profileName
+        postTextView?.text = post.textPost
+        dateTextView?.text = dateFormat.format(post.date)
+
+        // Picasso.get().load(uri).into(profileImage)
+        if(post.ProfileImage != "image") {
+            try {
+                Picasso.get()
+                    .load(post.ProfileImage)
+                    .transform(CropCircleTransformation())
+                    .into(imageProfile)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // Handle the error, e.g., set a placeholder image
+                //imagePost!!.setImageResource(R.drawable.image)
+            }
+        }
+
+        if (imagePost != null) {
+            try {
+                imagePost?.visibility = View.VISIBLE
+                Picasso.get().load(post.imagePost).into(imagePost)
+            } catch (e: Exception) {
+                imagePost?.visibility = View.GONE
+                e.printStackTrace()
+                // Handle the error, e.g., set a placeholder image
+                //imagePost!!.setImageResource(R.drawable.image)
+            }
+        }
+        //val resourceId = itemView.context.resources.getIdentifier(post.imagePost, "drawable", itemView.context.packageName)
+        //imagePost?.setImageResource(resourceId)
+
+        editButton?.setOnClickListener(){
+            onEditClick(post.postId)
+        }
+        deleteButton?.setOnClickListener {
+            AlertDialog.Builder(itemView.context)
+                .setTitle("Delete Post")
+                .setMessage("Are you sure you want to delete this post?")
+                .setPositiveButton("Yes") { dialog, _ ->
+                    Model.shared.deletePost(post.postId) { success, error ->
+                        if (success) {
+                            Toast.makeText(context, "Your post was deleted successfully!", Toast.LENGTH_LONG).show()
+                            (itemView.context as? MainActivity)?.MyPostsButtonClicked()
+                        } else {
+                            Toast.makeText(context, "Connection failed", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
+
+
+
+    }
+
+
+}
+
+class MyPostRecycleAdapter(private var posts : List<Post>?, private val onEditClick: (String) -> Unit): RecyclerView.Adapter<MyPostsViewHolder>() {
+    override fun getItemCount(): Int {
+        return posts?.size ?: 0
+    }
+    fun set(_posts: List<Post>) {
+        posts = _posts
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyPostsViewHolder {
+        val inflation=LayoutInflater.from(parent.context)
+        val view = inflation.inflate(R.layout.my_post_row, parent, false)
+        return MyPostsViewHolder(view, onEditClick);
+    }
+
+
+    override fun onBindViewHolder(holder: MyPostsViewHolder, position: Int) {
+        holder.bind(posts?.get(position) ?: return)
+    }
+
+
+}
+
+
+
+
+class MyPostsFragment : Fragment() {
+    var adapter: MyPostRecycleAdapter? = null
+    var posts: MutableList<Post> = ArrayList()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        var view = inflater.inflate(R.layout.fragment_feed, container, false)
+
+        posts = Model.shared.posts
+        val recyclerView: RecyclerView = view.findViewById(R.id.fragment_feed_recycler_view)
+        recyclerView.setHasFixedSize(true)
+
+        val layoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = layoutManager
+
+        adapter = MyPostRecycleAdapter(posts){postId->
+            editPostButtonClicked(postId)
+        }
+        recyclerView.adapter = adapter
+        getMyPosts()
+
+
+
+
+        return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getMyPosts()
+
+    }
+    fun editPostButtonClicked(postId: String?) {
+        (activity as? MainActivity)?.editPost(postId)
+    }
+
+    private fun getMyPosts() {
+
+        Model.shared.getMyposts { fetchedPosts ->
+            // Ensure posts are updated only after fetching data from the database
+            posts.clear()
+            posts.addAll(fetchedPosts)
+
+            adapter?.set(posts)
+            adapter?.notifyDataSetChanged()
+        }
+    }
+}

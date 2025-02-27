@@ -70,6 +70,11 @@ dependencies {
     implementation (libs.cloudinary.android)
     implementation (libs.picasso)
     implementation(libs.wasabeef.picasso.transformations)
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    implementation (libs.androidx.recyclerview)
+    implementation ("androidx.cardview:cardview:1.0.0")
 
 
 

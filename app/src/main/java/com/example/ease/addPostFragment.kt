@@ -32,6 +32,8 @@ class addPostFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private var isEdit: Boolean = false
+    private var postId: String? = null
 
 
     private var cameraLauncher: ActivityResultLauncher<Void?>? = null
@@ -42,6 +44,9 @@ class addPostFragment : Fragment() {
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
+            isEdit= it.getBoolean(ARG_IS_EDIT, false)
+            postId= it.getString(ARG_POST_ID)
+
         }
     }
 
@@ -61,6 +66,7 @@ class addPostFragment : Fragment() {
         var postImage=view.findViewById<ImageView>(R.id.postImage)
         var profileImage=view.findViewById<ImageView>(R.id.profileImage)
         var addedImageToPost: Boolean = false
+        var postServer= Model.shared
 
         postButton.setOnClickListener {
 
@@ -139,9 +145,68 @@ class addPostFragment : Fragment() {
                 Picasso.get().load(uri).into(profileImage)
             }
         }
+        if(isEdit){
+            postButton.text = "Edit"
+            postServer.getPostById(postId!!){post->
+                post?.let {
+                    postText.setText(it.textPost)
+                    if(it.imagePost.isNotEmpty()){
+                        Picasso.get().load(it.imagePost).into(postImage)
+                        addedImageToPost = true
+                    }
+                }
+
+            }
+            postButton.setOnClickListener(){
+                var postTextString=postText.text.toString()
+                if(postTextString.isNotEmpty()){
+                    if (addedImageToPost){
+                        postImage.isDrawingCacheEnabled = true
+                        postImage.buildDrawingCache()
+                        val bitmap = (postImage.drawable as BitmapDrawable).bitmap
+                        Model.shared.editPost(postId?:"" ,bitmap ,postTextString){ success, error ->
+                            if (success) {
+                                postText.text.clear()
+                                Toast.makeText(context,"Your post was updated successfully!",Toast.LENGTH_LONG).show()
+                                (activity as? MainActivity)?.MyPostsButtonClicked()
+
+                            } else {
+                                // Handle the error
+                                Toast.makeText(context,"Connection failed",Toast.LENGTH_LONG).show()
+
+                            }
+                        }
+                        postText.text.clear()
+                    }
+                    else{
+                        Model.shared.editPost(postId?:"",null ,postTextString){ success, error ->
+                            if (success) {
+                                postText.text.clear()
+                                Toast.makeText(context,"Your post was updated successfully!",Toast.LENGTH_LONG).show()
+                                (activity as? MainActivity)?.MyPostsButtonClicked()
+
+                            } else {
+                                // Handle the error
+                                Toast.makeText(context,"Connection failed",Toast.LENGTH_LONG).show()
+
+                            }
+                        }
+                        postText.text.clear()
+                    }
+
+                }
+                else{
+                    Toast.makeText(context,"Post empty is invalid",Toast.LENGTH_LONG).show()
+                }
+
+            }
+
+
+        }
 
         return view;
     }
+
 
 
 
@@ -154,13 +219,15 @@ class addPostFragment : Fragment() {
          * @param param2 Parameter 2.
          * @return A new instance of fragment addPostFragment.
          */
+        private const val ARG_IS_EDIT = "isEdit"
+        private const val ARG_POST_ID = "postId"
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(isEdit: Boolean, postId: String?) =
             addPostFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putBoolean(ARG_IS_EDIT, isEdit)
+                    putString(ARG_POST_ID, postId)
                 }
             }
     }

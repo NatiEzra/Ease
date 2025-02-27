@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         val addPostButton = findViewById<ImageView>(R.id.add_icon)
         addPostButton.setOnClickListener {
-            addPostButtonClicked() // Ensure `AddPostFragment` exists
+            addPostButtonClicked(false, null) // Ensure `AddPostFragment` exists
             //addtobackstack
 
         }
@@ -64,6 +64,10 @@ class MainActivity : AppCompatActivity() {
         profilePageButton.setOnClickListener{
             myProfilePageButtonClicked()
         }
+        val myPostsbutton=findViewById<ImageView>(R.id.my_posts_icon)
+        myPostsbutton.setOnClickListener{
+            MyPostsButtonClicked()
+        }
 
 
         var userServer= User.shared
@@ -75,6 +79,15 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
+    fun MyPostsButtonClicked() {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_container, MyPostsFragment())
+            addToBackStack(null)
+            commit()
+        }
+    }
+
     fun getUserName(): String {
         return profileName;
     }
@@ -83,10 +96,9 @@ class MainActivity : AppCompatActivity() {
     }
 
 // CHECK
-    fun addPostButtonClicked() {
-        // Replace the register fragment with the login fragment
+    fun addPostButtonClicked(isEdit: Boolean, postId: String?) {
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, addPostFragment())
+            replace(R.id.fragment_container, addPostFragment.newInstance(isEdit, postId))
             addToBackStack(null)
             commit()
         }
@@ -134,6 +146,13 @@ class MainActivity : AppCompatActivity() {
 
     fun showLoading(isLoading: Boolean) {
         progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+    fun editPost(postId: String?) {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_container, addPostFragment.newInstance(true, postId))
+            addToBackStack(null)
+            commit()
+        }
     }
 
 
