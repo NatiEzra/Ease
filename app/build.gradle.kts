@@ -75,6 +75,10 @@ dependencies {
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     implementation (libs.androidx.recyclerview)
     implementation ("androidx.cardview:cardview:1.0.0")
+    implementation (libs.okhttp)
+    implementation ("com.google.code.gson:gson:2.8.9")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
 
 

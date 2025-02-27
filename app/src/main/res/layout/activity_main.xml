@@ -66,7 +66,7 @@
             android:maxWidth="40dp" />
 
         <ImageView
-            android:id="@+id/feed_icon"
+            android:id="@+id/articles_icon"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

@@ -1,5 +1,7 @@
 package com.example.ease
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -77,6 +79,10 @@ class MainActivity : AppCompatActivity() {
                 userEmail = user["email"].toString()
             }
         }
+        val articlesButton=findViewById<ImageView>(R.id.articles_icon)
+        articlesButton.setOnClickListener{
+            articlesButtonClicked()
+        }
 
     }
 
@@ -94,6 +100,13 @@ class MainActivity : AppCompatActivity() {
     fun getUserEmail(): String {
         return userEmail;
     }
+    fun articlesButtonClicked(){
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_container, articlesFragment())
+            addToBackStack(null)
+            commit()
+        }
+    }
 
 // CHECK
     fun addPostButtonClicked(isEdit: Boolean, postId: String?) {
@@ -104,6 +117,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun openInBrowser(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(intent)
+    }
     fun homePageButtonClicked() {
 
         supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
