@@ -19,6 +19,7 @@ picassoTransformationsVersion = "2.4.0"
 playServicesAuth = "21.3.0"
 recyclerview = "1.4.0"
 retrofit = "2.9.0"
+playServicesMaps = "19.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +41,7 @@ picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 wasabeef-picasso-transformations = { module = "jp.wasabeef:picasso-transformations", version.ref = "picassoTransformationsVersion" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

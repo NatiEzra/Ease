@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -39,6 +40,7 @@ class addPostFragment : Fragment() {
 
     private var cameraLauncher: ActivityResultLauncher<Void?>? = null
     private var galleryLauncher: ActivityResultLauncher<String>? = null
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +60,7 @@ class addPostFragment : Fragment() {
         // Inflate the layout for this fragment
         var view= inflater.inflate(R.layout.fragment_add_post, container, false)
         var profileName=view.findViewById<TextView>(R.id.profileName)
+        progressBar = view.findViewById(R.id.profileImageAddPostProgressBar)
         var postText=view.findViewById<EditText>(R.id.addPostEditText)
         var postButton=view.findViewById<TextView>(R.id.postButton)
         var userServer= User.shared
@@ -140,10 +143,17 @@ class addPostFragment : Fragment() {
             }
             builder.show()
         }
-
+        progressBar.visibility = View.VISIBLE
+        profileImage.visibility=View.GONE
         userServer.getProfileImage { uri ->
             if (uri != null) {
                 Picasso.get().load(uri).transform(CropCircleTransformation()).into(profileImage)
+                progressBar.visibility = View.GONE
+                profileImage.visibility=View.VISIBLE
+            }
+            else{
+                progressBar.visibility = View.GONE
+                profileImage.visibility=View.VISIBLE
             }
         }
         if(isEdit){

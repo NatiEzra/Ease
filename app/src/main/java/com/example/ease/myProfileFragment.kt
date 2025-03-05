@@ -7,8 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
 import com.example.ease.model.AuthRepository
 import com.example.ease.model.User
 import com.squareup.picasso.Picasso
@@ -28,7 +30,7 @@ class myProfileFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    private lateinit var progressBar: ProgressBar
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -49,10 +51,21 @@ class myProfileFragment : Fragment() {
         }
 
         val profileImage = view.findViewById<ImageView>(R.id.profileImage)
+        progressBar = view.findViewById(R.id.profileImageProgressBar)
         val userServer = User.shared
+        progressBar.visibility = View.VISIBLE
+        profileImage.visibility=View.GONE
         userServer.getProfileImage { uri ->
             if (uri != null) {
+
                 Picasso.get().load(uri).transform(CropCircleTransformation()).into(profileImage)
+                progressBar.visibility = View.GONE
+                profileImage.visibility=View.VISIBLE
+
+            }
+            else{
+                progressBar.visibility = View.GONE
+                profileImage.visibility=View.VISIBLE
 
             }
         }

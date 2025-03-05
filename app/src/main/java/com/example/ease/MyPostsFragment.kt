@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -120,6 +121,7 @@ class MyPostRecycleAdapter(private var posts : List<Post>?, private val onEditCl
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyPostsViewHolder {
         val inflation=LayoutInflater.from(parent.context)
         val view = inflation.inflate(R.layout.my_post_row, parent, false)
+
         return MyPostsViewHolder(view, onEditClick);
     }
 
@@ -137,16 +139,20 @@ class MyPostRecycleAdapter(private var posts : List<Post>?, private val onEditCl
 class MyPostsFragment : Fragment() {
     var adapter: MyPostRecycleAdapter? = null
     var posts: MutableList<Post> = ArrayList()
-
+    private lateinit var progressBar: ProgressBar
+    private lateinit var recyclerView: RecyclerView
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         var view = inflater.inflate(R.layout.fragment_feed, container, false)
+        progressBar = view.findViewById(R.id.feedProgressBar)
+        recyclerView = view.findViewById(R.id.fragment_feed_recycler_view)
 
+        progressBar.visibility = View.GONE
+        recyclerView.visibility = View.VISIBLE
         posts = Model.shared.posts
-        val recyclerView: RecyclerView = view.findViewById(R.id.fragment_feed_recycler_view)
         recyclerView.setHasFixedSize(true)
 
         val layoutManager = LinearLayoutManager(context)
@@ -158,14 +164,13 @@ class MyPostsFragment : Fragment() {
         recyclerView.adapter = adapter
         getMyPosts()
 
-
-
-
         return view
     }
 
     override fun onResume() {
         super.onResume()
+       // progressBar.visibility = View.VISIBLE
+        //recyclerView.visibility = View.GONE
         getMyPosts()
 
     }
@@ -182,6 +187,8 @@ class MyPostsFragment : Fragment() {
 
             adapter?.set(posts)
             adapter?.notifyDataSetChanged()
+            //progressBar.visibility = View.GONE
+           // recyclerView.visibility = View.VISIBLE
         }
     }
 }

@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -126,6 +127,7 @@ class articlesFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
     private lateinit var adapter: ArticleRecycleAdapter
     private var articles: List<Article> = listOf()
 
@@ -143,8 +145,9 @@ class articlesFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view= inflater.inflate(R.layout.fragment_articles, container, false)
+        progressBar = view.findViewById(R.id.articlesProgressBar)
+        recyclerView= view.findViewById(R.id.articlesRecyclerView)
 
-        val recyclerView: RecyclerView = view.findViewById(R.id.articlesRecyclerView)
         recyclerView.setHasFixedSize(true)
 
         val layoutManager = LinearLayoutManager(context)
@@ -166,9 +169,11 @@ class articlesFragment : Fragment() {
     private fun fetchArticles() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                progressBar.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
                 val client = OkHttpClient()
                 val request = Request.Builder()
-                    .url("https://newsapi.org/v2/everything?q=post%20traumatic&sortBy=publishedAt&apiKey=c0bc1b71338248b387ab4a5e3cf5268c")
+                    .url("https://newsapi.org/v2/everything?q=mental%20health%20post%20trauma%20PTSD&sortBy=publishedAt&apiKey=c0bc1b71338248b387ab4a5e3cf5268c")
                     .build()
 
                 val response = client.newCall(request).execute()
@@ -194,6 +199,8 @@ class articlesFragment : Fragment() {
                     CoroutineScope(Dispatchers.Main).launch {
                         adapter.set(articles)
                         adapter.notifyDataSetChanged()
+                        progressBar.visibility = View.GONE
+                        recyclerView.visibility = View.VISIBLE
                     }
                 }
             } catch (e: IOException) {

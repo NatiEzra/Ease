@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -120,7 +121,8 @@ class FeedFragment : Fragment() {
     //var adapter: PostRecycleAdapter? = null
     var adapter = PostRecycleAdapter(Model.shared.posts)
     var posts: MutableList<Post> = ArrayList()
-
+    private lateinit var progressBar: ProgressBar
+    private lateinit var  recyclerView: RecyclerView
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -128,8 +130,11 @@ class FeedFragment : Fragment() {
     ): View? {
         var view = inflater.inflate(R.layout.fragment_feed, container, false)
 
+        progressBar = view.findViewById(R.id.feedProgressBar)
+
         posts = Model.shared.posts
-        val recyclerView: RecyclerView = view.findViewById(R.id.fragment_feed_recycler_view)
+
+        recyclerView = view.findViewById(R.id.fragment_feed_recycler_view)
         recyclerView.setHasFixedSize(true)
 
         val layoutManager = LinearLayoutManager(context)
@@ -143,6 +148,8 @@ class FeedFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        progressBar.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
         getAllPosts()
 
     }
@@ -151,11 +158,14 @@ class FeedFragment : Fragment() {
 
         Model.shared.getPosts { fetchedPosts ->
             // Ensure posts are updated only after fetching data from the database
+
             posts.clear()
             posts.addAll(fetchedPosts)
 
             adapter?.set(posts)
             adapter?.notifyDataSetChanged()
+            progressBar.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
         }
     }
 }

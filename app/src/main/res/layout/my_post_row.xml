@@ -8,15 +8,19 @@
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
     android:clipToPadding="false"
-    android:layoutDirection="ltr"> <!-- קובע שהעיצוב תמיד יהיה שמאל לימין -->
+    android:layoutDirection="ltr"
+    android:backgroundTint="#F5F5F5"> <!-- קובע שהעיצוב תמיד יהיה שמאל לימין -->
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#A600BCD4"
+        android:layout_height="wrap_content"
+        android:minHeight="154dp"
+        android:background="@android:color/transparent"
         android:clipToOutline="true"
-        android:layoutDirection="ltr"
-        android:minHeight="154dp"> <!-- גם כאן נוודא אחידות -->
+        android:layoutDirection="ltr">
+
+
 
         <TextView
             android:id="@+id/profileName"
