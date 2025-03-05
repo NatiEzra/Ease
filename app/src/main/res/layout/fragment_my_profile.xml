@@ -45,14 +45,12 @@
             android:textSize="16sp"
             android:textColor="#000000" />
 
-        <!-- אימייל -->
-        <EditText
+
+        <TextView
             android:id="@+id/profileName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-
-            android:hint="Name"
             android:padding="12dp" />
 
         <TextView
@@ -62,12 +60,10 @@
             android:textSize="16sp"
             android:textColor="#000000" />
 
-        <EditText
+        <TextView
             android:id="@+id/profileEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email"
-            android:background="?android:attr/editTextBackground"
             android:padding="12dp"
             android:layout_marginBottom="16dp" />
 

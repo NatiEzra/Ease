@@ -60,6 +60,8 @@
 
     <!-- אזור כפתור העלאת מדיה -->
 
+
+
     <ImageView
         android:id="@+id/postImage"
         android:layout_width="102dp"

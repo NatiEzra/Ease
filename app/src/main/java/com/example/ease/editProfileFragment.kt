@@ -1,13 +1,17 @@
 package com.example.ease
 
 import android.app.AlertDialog
+import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -16,6 +20,7 @@ import androidx.collection.emptyLongSet
 import com.example.ease.model.Model
 import com.example.ease.model.User
 import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -58,8 +63,10 @@ class editProfileFragment : Fragment() {
         var userServer= User.shared
         cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
             //binding?.imageView?.setImageBitmap(bitmap)
-            if(bitmap!=null){
+            if (bitmap != null) {
                 profileImage.setImageBitmap(bitmap)
+                val uri = Uri.parse(MediaStore.Images.Media.insertImage(context?.contentResolver, bitmap, null, null))
+                Picasso.get().load(uri).transform(CropCircleTransformation()).into(profileImage)
                 addedImageToProfile = true
             }
 
@@ -85,31 +92,56 @@ class editProfileFragment : Fragment() {
             }
             builder.show()
         }
-
+        val editProfilePassword=view.findViewById<EditText>(R.id.editProfilePassword)
+        val editProfileName=view.findViewById<EditText>(R.id.editProfileName)
+        val editProfileConfirmPass=view.findViewById<EditText>(R.id.editProfileConfirmPassword)
         saveButton.setOnClickListener {
-            if (addedImageToProfile) {
+
+            val bitmap: Bitmap?
+            if(addedImageToProfile)
+            {
+                 bitmap = (profileImage.drawable as BitmapDrawable).bitmap
+            }
+            else{
+                bitmap= null
+            }
+            if(editProfilePassword.text.toString()!=editProfileConfirmPass.text.toString()){
+                Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+            }
+            else if(editProfilePassword.text.toString().length<6 && editProfilePassword.text.toString().isNotEmpty()){
+                Toast.makeText(context, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+            }
+            else {
                 profileImage.isDrawingCacheEnabled = true
                 profileImage.buildDrawingCache()
-                val bitmap = (profileImage.drawable as BitmapDrawable).bitmap
-                userServer.editUser(bitmap) { success, error ->
+                userServer.editUser(
+                    editProfileName.text.toString(),
+                    editProfilePassword.text.toString(),
+                    bitmap
+                ) { success, error ->
                     if (success) {
-                        Toast.makeText(context, "Profile image updated", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Profile updated", Toast.LENGTH_SHORT).show()
+                        (activity as? MainActivity)?.refreshProfile()
+                        (activity as? MainActivity)?.homePageButtonClicked()
+
+
+
                     } else {
                         Toast.makeText(context, "Error: $error", Toast.LENGTH_SHORT).show()
                     }
                 }
-
-
             }
-
+        }
+        val CancelButtonEditProfile=view.findViewById<Button>(R.id.CancelButtonEditProfile)
+        CancelButtonEditProfile.setOnClickListener {
+            (activity as? MainActivity)?.myProfilePageButtonClicked()
         }
 
         userServer.getProfileImage { uri ->
             if (uri != null) {
-                Picasso.get().load(uri).into(profileImage)
+                Picasso.get().load(uri).transform(CropCircleTransformation()).into(profileImage)
             }
         }
-
 
 
 

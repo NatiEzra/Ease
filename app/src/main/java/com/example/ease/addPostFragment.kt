@@ -17,6 +17,7 @@ import com.example.ease.model.AuthRepository
 import com.example.ease.model.Model
 import com.example.ease.model.User
 import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -142,7 +143,7 @@ class addPostFragment : Fragment() {
 
         userServer.getProfileImage { uri ->
             if (uri != null) {
-                Picasso.get().load(uri).into(profileImage)
+                Picasso.get().load(uri).transform(CropCircleTransformation()).into(profileImage)
             }
         }
         if(isEdit){

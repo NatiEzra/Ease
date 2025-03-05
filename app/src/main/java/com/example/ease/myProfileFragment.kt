@@ -12,6 +12,7 @@ import android.widget.Toast
 import com.example.ease.model.AuthRepository
 import com.example.ease.model.User
 import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -51,7 +52,8 @@ class myProfileFragment : Fragment() {
         val userServer = User.shared
         userServer.getProfileImage { uri ->
             if (uri != null) {
-                Picasso.get().load(uri).into(profileImage)
+                Picasso.get().load(uri).transform(CropCircleTransformation()).into(profileImage)
+
             }
         }
 
@@ -62,6 +64,11 @@ class myProfileFragment : Fragment() {
             Toast.makeText(context,"You logged out, have a great day", Toast.LENGTH_LONG).show()
             (activity as? MainActivity)?.navigateToLogin()
         }
+        val profileName = view.findViewById<TextView>(R.id.profileName)
+        val profileEmail=view.findViewById<TextView>(R.id.profileEmail)
+        profileName.text = (activity as? MainActivity)?.getUserName()
+        profileEmail.text = (activity as? MainActivity)?.getUserEmail()
+
 
         return view
     }

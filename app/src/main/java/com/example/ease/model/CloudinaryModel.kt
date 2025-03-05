@@ -42,15 +42,12 @@ class CloudinaryModel {
         }
     }
     fun uploadImage(bitmap: Bitmap, name : String, onSuccess: (String?) -> Unit, onError: (String?) -> Unit){
-        Log.d("Cloudinary", "uploadImage0 ofek ")
         //val context= MyApplication.Globals.context ?:return
         val context = MyApplication.Globals.context
         if (context == null){
             return
         }
-        Log.d("Cloudinary", "uploadImage1 ofek ")
         val file :File= bitmap.toFile( context,name )
-        Log.d("Cloudinary", "uploadImage2 ofek ")
         MediaManager.get().upload(file.path)
             .option("folder", "images")
             .callback(object: UploadCallback{
@@ -64,13 +61,11 @@ class CloudinaryModel {
                 }
 
                 override fun onSuccess(requestId: String?, resultData: Map<*, *>) {
-                    Log.d("Cloudinary", "uploadImage3 ofek ")
                     val url=resultData["secure_url"] as? String?: ""
                     onSuccess(url)
                 }
 
                 override fun onError(requestId: String?, error: ErrorInfo?) {
-                    Log.d("Cloudinary", "uploadImage4 ofek ")
                     onError(error?.description?: "Unknown error")
                 }
 

@@ -100,6 +100,15 @@ class MainActivity : AppCompatActivity() {
     fun getUserEmail(): String {
         return userEmail;
     }
+    fun refreshProfile(){
+        var userServer= User.shared
+        userServer.getUser { user ->
+            if (user != null) {
+                profileName = user["name"].toString()
+                userEmail = user["email"].toString()
+            }
+        }
+    }
     fun articlesButtonClicked(){
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container, articlesFragment())

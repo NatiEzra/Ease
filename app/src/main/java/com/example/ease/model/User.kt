@@ -81,7 +81,7 @@ class User {
         }
     }
 
-    fun editUser(image: Bitmap?, onComplete: (Boolean, String?) -> Unit) {
+    fun editUser(name: String, password: String, image: Bitmap?, onComplete: (Boolean, String?) -> Unit) {
         val userEmail = auth.currentUser?.email
         if (userEmail != null) {
             db.collection("users")
@@ -91,51 +91,99 @@ class User {
                     if (!documents.isEmpty) {
                         val userDocument = documents.documents[0]
                         val documentReference = userDocument.reference
+                        var updateCount = 0
+                        var totalUpdates = 0
+                        var hasError = false
 
-                        if (image != null) {
-                            // Delete the previous profile image
-                            val previousImageUrl = userDocument.getString("image")
-                            if (!previousImageUrl.isNullOrEmpty()) {
-                                cloudinaryModel.deleteImage(previousImageUrl) { deleteSuccess, deleteError ->
-                                    if (deleteSuccess) {
-                                        // Upload the new profile image
-                                        uploadImageToCloudinary(image, auth.getCurrentUserEmail(), { uri ->
-                                            Log.d("Firestore", "Image upload completed")
-                                            if (!uri.isNullOrBlank()) {
-                                                documentReference.update("image", uri)
-                                                    .addOnSuccessListener {
-                                                        onComplete(true, null)
-                                                    }
-                                                    .addOnFailureListener { e ->
-                                                        onComplete(false, e.localizedMessage)
-                                                    }
-                                            }
-                                        }, { error ->
-                                            onComplete(false, error)
-                                        })
-                                    } else {
-                                        onComplete(false, deleteError)
-                                    }
+                        // Count the number of updates needed
+                        if (password.isNotEmpty()) totalUpdates++
+                        if (name.isNotEmpty()) totalUpdates++
+                        if (image != null) totalUpdates++
+
+                        // Function to check completion
+                        fun checkCompletion() {
+                            if (updateCount == totalUpdates && !hasError) {
+                                onComplete(true, null)
+                            } else if (hasError) {
+                                onComplete(false, "An error occurred while updating the profile.")
+                            }
+                        }
+
+                        // Update password if it's not empty
+                        if (password.isNotEmpty()) {
+                            auth.changePassword(password) { success, error ->
+                                if (success) {
+                                    Log.d("Firestore", "Password changed")
+                                } else {
+                                    hasError = true
                                 }
-                            } else {
-                                // Upload the new profile image if there is no previous image
-                                uploadImageToCloudinary(image, auth.getCurrentUserEmail(), { uri ->
-                                    Log.d("Firestore", "Image upload completed")
+                                updateCount++
+                                checkCompletion()
+                            }
+                        }
+
+                        // Update name if it's not empty
+                        if (name.isNotEmpty()) {
+                            documentReference.update("name", name)
+                                .addOnSuccessListener {
+                                    Log.d("Firestore", "Name updated")
+                                    updateCount++
+                                    checkCompletion()
+                                }
+                                .addOnFailureListener { e ->
+                                    hasError = true
+                                    updateCount++
+                                    checkCompletion()
+                                }
+                        }
+
+                        // Update image if it's not null
+                        if (image != null) {
+                            val previousImageUrl = userDocument.getString("image")
+                            val uploadImage = { bitmap: Bitmap ->
+                                uploadImageToCloudinary(bitmap, auth.getCurrentUserEmail(), { uri ->
                                     if (!uri.isNullOrBlank()) {
                                         documentReference.update("image", uri)
                                             .addOnSuccessListener {
-                                                onComplete(true, null)
+                                                Log.d("Firestore", "Image updated")
+                                                updateCount++
+                                                checkCompletion()
                                             }
                                             .addOnFailureListener { e ->
-                                                onComplete(false, e.localizedMessage)
+                                                hasError = true
+                                                updateCount++
+                                                checkCompletion()
                                             }
+                                    } else {
+                                        hasError = true
+                                        updateCount++
+                                        checkCompletion()
                                     }
                                 }, { error ->
-                                    onComplete(false, error)
+                                    hasError = true
+                                    updateCount++
+                                    checkCompletion()
                                 })
                             }
-                        } else {
-                            onComplete(false, "Image is null")
+
+                            if (!previousImageUrl.isNullOrEmpty()) {
+                                cloudinaryModel.deleteImage(previousImageUrl) { deleteSuccess, deleteError ->
+                                    if (deleteSuccess) {
+                                        uploadImage(image)
+                                    } else {
+                                        hasError = true
+                                        updateCount++
+                                        checkCompletion()
+                                    }
+                                }
+                            } else {
+                                uploadImage(image)
+                            }
+                        }
+
+                        // If no updates were needed, return early
+                        if (totalUpdates == 0) {
+                            onComplete(false, "No changes were made")
                         }
                     } else {
                         onComplete(false, "User not found")
@@ -148,6 +196,8 @@ class User {
             onComplete(false, "User email is null")
         }
     }
+
+
     private fun uploadImageToCloudinary(
         bitmap: Bitmap,
         name: String,
