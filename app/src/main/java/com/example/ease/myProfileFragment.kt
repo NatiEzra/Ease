@@ -5,8 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import com.example.ease.model.AuthRepository
 import com.example.ease.model.User
 import com.squareup.picasso.Picasso
 
@@ -43,6 +46,7 @@ class myProfileFragment : Fragment() {
         editButton.setOnClickListener {
             (activity as? MainActivity)?.editProfileButtonClicked()
         }
+
         val profileImage = view.findViewById<ImageView>(R.id.profileImage)
         val userServer = User.shared
         userServer.getProfileImage { uri ->
@@ -51,8 +55,13 @@ class myProfileFragment : Fragment() {
             }
         }
 
-
-
+        val logOutbtn=view.findViewById<Button>(R.id.logoutButton)
+        val authServer=AuthRepository.shared
+        logOutbtn.setOnClickListener {
+            authServer.signOut()
+            Toast.makeText(context,"You logged out, have a great day", Toast.LENGTH_LONG).show()
+            (activity as? MainActivity)?.navigateToLogin()
+        }
 
         return view
     }

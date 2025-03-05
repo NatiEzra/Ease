@@ -171,6 +171,12 @@ class MainActivity : AppCompatActivity() {
             commit()
         }
     }
+    fun navigateToLogin() {
+        val intent = Intent(this, LoginRegisterActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        finish()
+    }
 
 
 }
