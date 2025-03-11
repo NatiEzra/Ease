@@ -1,6 +1,8 @@
 package com.example.ease
 
 import android.app.AlertDialog
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -125,12 +127,28 @@ class addPostFragment : Fragment() {
         }
         galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri != null) {
-                postImage.setImageURI(uri)
-                addedImageToPost = true
+                try {
+                    val inputStream = requireContext().contentResolver.openInputStream(uri)
+                    val bitmap = BitmapFactory.decodeStream(inputStream)
+
+                    val maxWidth = 200
+                    val maxHeight = 200
+
+                    val resizedBitmap = resizeBitmap(bitmap, maxWidth, maxHeight)
+
+                    postImage.setImageBitmap(resizedBitmap)
+                    addedImageToPost = true
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(context, "Failed to load image", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
-        addMediaButton.setOnClickListener(){
+
+
+
+            addMediaButton.setOnClickListener(){
             val options = arrayOf("Take Photo", "Choose from Gallery")
             val customTitle = layoutInflater.inflate(R.layout.dialog_title, null)
             val builder = AlertDialog.Builder(requireContext())
@@ -217,6 +235,25 @@ class addPostFragment : Fragment() {
 
         return view;
     }
+
+        private fun resizeBitmap(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
+            val width = bitmap.width
+            val height = bitmap.height
+            val aspectRatio = width.toFloat() / height.toFloat()
+
+            val newWidth: Int
+            val newHeight: Int
+
+            if (width > height) {
+                newWidth = maxWidth
+                newHeight = (maxWidth / aspectRatio).toInt()
+            } else {
+                newHeight = maxHeight
+                newWidth = (maxHeight * aspectRatio).toInt()
+            }
+
+            return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+        }
 
 
 
