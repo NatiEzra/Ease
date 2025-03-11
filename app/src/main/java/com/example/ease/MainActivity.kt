@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +26,19 @@ class MainActivity : AppCompatActivity() {
     private var userEmail: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                    val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+
+                    if (currentFragment !is FeedFragment) {
+                        homePageButtonClicked()
+                    } else {
+                        finishAffinity()
+                    }
+            }
+        })
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
@@ -133,8 +147,6 @@ class MainActivity : AppCompatActivity() {
     fun homePageButtonClicked() {
 
         supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-
-        // Replace the register fragment with the login fragment
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container, FeedFragment())
             commit()
@@ -144,23 +156,22 @@ class MainActivity : AppCompatActivity() {
     }
     fun myProfilePageButtonClicked() {
 
-        supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-
-        // Replace the register fragment with the login fragment
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, myProfileFragment())
+            replace(R.id.fragment_container,myProfileFragment())
+            addToBackStack(null)
             commit()
         }
+
 
 
     }
 
     fun editProfileButtonClicked(){
-        supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.fragment_container, editProfileFragment())
             commit()
         }
+
     }
 
     private fun replaceFragment(fragment: Fragment) {
@@ -186,6 +197,9 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+
+
+
 
 
 }
