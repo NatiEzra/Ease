@@ -176,16 +176,21 @@ class addPostFragment : Fragment() {
         }
         if(isEdit){
             postButton.text = "Edit"
-            postServer.getPostById(postId!!){post->
+            postServer.getPostById(postId!!) { post ->
                 post?.let {
                     postText.setText(it.textPost)
-                    if(it.imagePost.isNotEmpty()){
-                        Picasso.get().load(it.imagePost).into(postImage)
+                    if (it.imagePost.isNotEmpty()) {
+                        Picasso.get()
+                            .load(it.imagePost)
+                            .resize(200, 200) // Resize to max 200x200
+                            .centerInside() // Maintain aspect ratio
+                            .into(postImage)
+
                         addedImageToPost = true
                     }
                 }
-
             }
+
             postButton.setOnClickListener(){
                 var postTextString=postText.text.toString()
                 if(postTextString.isNotEmpty()){
