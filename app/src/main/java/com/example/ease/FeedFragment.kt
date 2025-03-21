@@ -1,10 +1,15 @@
 package com.example.ease
 
+import android.app.Dialog
+import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -74,17 +79,19 @@ class PostsViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
             }
         }
 
-        if (imagePost != null) {
-            try {
-                imagePost?.visibility = View.VISIBLE
-                Picasso.get().load(post.imagePost).into(imagePost)
-            } catch (e: Exception) {
-                imagePost?.visibility = View.GONE
-                e.printStackTrace()
-                // Handle the error, e.g., set a placeholder image
-                //imagePost!!.setImageResource(R.drawable.image)
+            if (imagePost!=null&& imagePost?.context!=null) {
+                try {
+                    imagePost?.visibility = View.VISIBLE
+                    Picasso.get().load(post.imagePost).into(imagePost)
+                    imagePost?.setOnClickListener {
+                        showFullScreenImage(post.imagePost, imagePost!!.context)
+                    }
+                } catch (e: Exception) {
+                    imagePost?.visibility = View.GONE
+                    e.printStackTrace()
+                }
             }
-        }
+
         //val resourceId = itemView.context.resources.getIdentifier(post.imagePost, "drawable", itemView.context.packageName)
         //imagePost?.setImageResource(resourceId)
 
@@ -93,7 +100,18 @@ class PostsViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
     }
 
 }
+fun showFullScreenImage(imageUrl: String, context: Context) {
+    val dialog = Dialog(context)
+    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+    dialog.setContentView(R.layout.dialog_fullscreen_image)
 
+    val imageView = dialog.findViewById<ImageView>(R.id.fullScreenImageView)
+    Picasso.get().load(imageUrl).into(imageView)
+
+    dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.BLACK))
+    dialog.show()
+}
 class PostRecycleAdapter(private var posts : List<Post>?): RecyclerView.Adapter<PostsViewHolder>() {
     override fun getItemCount(): Int {
         return posts?.size ?: 0

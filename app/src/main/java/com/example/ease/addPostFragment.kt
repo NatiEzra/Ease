@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -71,6 +72,8 @@ class addPostFragment : Fragment() {
         var addMediaButton=view.findViewById<TextView>(R.id.addMediaButton)
         var postImage=view.findViewById<ImageView>(R.id.postImage)
         var profileImage=view.findViewById<ImageView>(R.id.profileImage)
+        var deleteImageButton=view.findViewById<ImageButton>(R.id.deleteImageButton)
+        deleteImageButton.visibility=View.GONE
         var addedImageToPost: Boolean = false
         var postServer= Model.shared
 
@@ -122,6 +125,7 @@ class addPostFragment : Fragment() {
             if(bitmap!=null) {
                 postImage.setImageBitmap(bitmap)
                 addedImageToPost = true
+                deleteImageButton.visibility = View.VISIBLE
             }
             //binding?.imageView?.setImageBitmap(bitmap)
         }
@@ -147,7 +151,11 @@ class addPostFragment : Fragment() {
 
 
 
-
+        deleteImageButton.setOnClickListener {
+            postImage.setImageResource(0)
+            addedImageToPost = false
+            deleteImageButton.visibility = View.GONE
+        }
             addMediaButton.setOnClickListener(){
             val options = arrayOf("Take Photo", "Choose from Gallery")
             val customTitle = layoutInflater.inflate(R.layout.dialog_title, null)
@@ -180,6 +188,7 @@ class addPostFragment : Fragment() {
                 post?.let {
                     postText.setText(it.textPost)
                     if (it.imagePost.isNotEmpty()) {
+                        deleteImageButton.visibility = View.VISIBLE
                         Picasso.get()
                             .load(it.imagePost)
                             .resize(200, 200) // Resize to max 200x200
