@@ -16,31 +16,71 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import com.example.ease.model.User
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var navController: NavController
     private lateinit var progressBar: ProgressBar
     private var profileName: String = ""
     private var userEmail: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                    val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-
-                    if (currentFragment !is FeedFragment) {
-                        homePageButtonClicked()
-                    } else {
-                        finishAffinity()
-                    }
-            }
-        })
+//        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() {
+//                    val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+//
+//                    if (currentFragment !is FeedFragment) {
+//                        homePageButtonClicked()
+//                    } else {
+//                        finishAffinity()
+//                    }
+//            }
+//        })
 
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        navController = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)?.findNavController()
+            ?: throw IllegalStateException("NavController not found")
+
+        // Set up bottom navigation (if needed)
+        findViewById<ImageView>(R.id.home_icon).setOnClickListener {
+            navController.navigate(R.id.feedFragment)
+        }
+
+        findViewById<ImageView>(R.id.articles_icon).setOnClickListener {
+            navController.navigate(R.id.articlesFragment)
+        }
+
+        findViewById<ImageView>(R.id.my_posts_icon).setOnClickListener {
+            navController.navigate(R.id.myPostsFragment)
+        }
+
+        findViewById<ImageView>(R.id.add_icon).setOnClickListener {
+            val currentDestination = navController.currentDestination?.id
+            val action = when (currentDestination) {
+                R.id.feedFragment -> FeedFragmentDirections.actionFeedFragmentToAddPostFragment(isEdit=false, postId = null)
+                R.id.myPostsFragment -> MyPostsFragmentDirections.actionMyPostsFragmentToAddPostFragment(isEdit=false, postId = null)
+                R.id.myProfileFragment -> myProfileFragmentDirections.actionMyProfileFragmentToAddPostFragment(isEdit=false, postId = null)
+                R.id.articlesFragment -> articlesFragmentDirections.actionArticlesFragmentToAddPostFragment(isEdit=false, postId = null)
+                R.id.editProfileFragment -> editProfileFragmentDirections.actionEditProfileFragmentToAddPostFragment(isEdit=false, postId = null)
+                else -> return@setOnClickListener
+            }
+            navController.navigate(action)
+        }
+
+        findViewById<ImageView>(R.id.profile_icon).setOnClickListener {
+            navController.navigate(R.id.myProfileFragment)
+        }
+
 
         //progressBar = findViewById(R.id.progressBar)
         //progressBar.findViewById<ProgressBar>(R.id.progressBar)
@@ -58,32 +98,29 @@ class MainActivity : AppCompatActivity() {
         }
         */
 
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, FeedFragment())
-            commit()
-            }
+        //navController.navigate(R.id.feedFragment)
 
-        val addPostButton = findViewById<ImageView>(R.id.add_icon)
-        addPostButton.setOnClickListener {
-            addPostButtonClicked(false, null) // Ensure `AddPostFragment` exists
-            //addtobackstack
-
-        }
-
-
-        val homePageButton = findViewById<ImageView>(R.id.home_icon)
-        homePageButton.setOnClickListener {
-            homePageButtonClicked()
-        }
-
-        val profilePageButton=findViewById<ImageView>(R.id.profile_icon)
-        profilePageButton.setOnClickListener{
-            myProfilePageButtonClicked()
-        }
-        val myPostsbutton=findViewById<ImageView>(R.id.my_posts_icon)
-        myPostsbutton.setOnClickListener{
-            MyPostsButtonClicked()
-        }
+//        val addPostButton = findViewById<ImageView>(R.id.add_icon)
+//        addPostButton.setOnClickListener {
+//            addPostButtonClicked(false, null) // Ensure `AddPostFragment` exists
+//            //addtobackstack
+//
+//        }
+//
+//
+//        val homePageButton = findViewById<ImageView>(R.id.home_icon)
+//        homePageButton.setOnClickListener {
+//            homePageButtonClicked()
+//        }
+//
+//        val profilePageButton=findViewById<ImageView>(R.id.profile_icon)
+//        profilePageButton.setOnClickListener{
+//            myProfilePageButtonClicked()
+//        }
+//        val myPostsbutton=findViewById<ImageView>(R.id.my_posts_icon)
+//        myPostsbutton.setOnClickListener{
+//            MyPostsButtonClicked()
+//        }
 
 
         var userServer= User.shared
@@ -93,19 +130,15 @@ class MainActivity : AppCompatActivity() {
                 userEmail = user["email"].toString()
             }
         }
-        val articlesButton=findViewById<ImageView>(R.id.articles_icon)
-        articlesButton.setOnClickListener{
-            articlesButtonClicked()
-        }
+//        val articlesButton=findViewById<ImageView>(R.id.articles_icon)
+//        articlesButton.setOnClickListener{
+//            articlesButtonClicked()
+//        }
 
     }
 
     fun MyPostsButtonClicked() {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, MyPostsFragment())
-            addToBackStack(null)
-            commit()
-        }
+        navController.navigate(R.id.myPostsFragment)
     }
 
     fun getUserName(): String {
@@ -124,21 +157,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
     fun articlesButtonClicked(){
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, articlesFragment())
-            addToBackStack(null)
-            commit()
-        }
+        navController.navigate(R.id.articlesFragment)
     }
 
 // CHECK
-    fun addPostButtonClicked(isEdit: Boolean, postId: String?) {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, addPostFragment.newInstance(isEdit, postId))
-            addToBackStack(null)
-            commit()
-        }
-    }
+
 
     fun openInBrowser(url: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -146,31 +169,19 @@ class MainActivity : AppCompatActivity() {
     }
     fun homePageButtonClicked() {
 
-        supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, FeedFragment())
-            commit()
-        }
-
+        navController.navigate(R.id.feedFragment)
 
     }
     fun myProfilePageButtonClicked() {
 
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container,myProfileFragment())
-            addToBackStack(null)
-            commit()
-        }
+        navController.navigate(R.id.myProfileFragment)
 
 
 
     }
 
     fun editProfileButtonClicked(){
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, editProfileFragment())
-            commit()
-        }
+        navController.navigate(R.id.editProfileFragment)
 
     }
 
@@ -185,11 +196,8 @@ class MainActivity : AppCompatActivity() {
         progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
     fun editPost(postId: String?) {
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, addPostFragment.newInstance(true, postId))
-            addToBackStack(null)
-            commit()
-        }
+        val action = MyPostsFragmentDirections.actionMyPostsFragmentToAddPostFragment(isEdit = true, postId = postId)
+        navController.navigate(action)
     }
     fun navigateToLogin() {
         val intent = Intent(this, LoginRegisterActivity::class.java)
