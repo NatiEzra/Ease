@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
+    id("androidx.navigation.safeargs.kotlin")
 
 }
 val secretsPropertiesFile = rootProject.file("secrets.properties")
@@ -54,7 +55,6 @@ android {
         jvmTarget = "11"
     }
 }
-
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -64,6 +64,9 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.play.services.auth)
     implementation(libs.play.services.maps)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.navigation.fragment)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -77,11 +80,15 @@ dependencies {
     implementation (libs.converter.gson)
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     implementation (libs.androidx.recyclerview)
-    implementation ("androidx.cardview:cardview:1.0.0")
+    implementation (libs.androidx.cardview)
     implementation (libs.okhttp)
     implementation ("com.google.code.gson:gson:2.8.9")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation (libs.kotlinx.coroutines.core)
+    implementation (libs.kotlinx.coroutines.android)
+    implementation (libs.androidx.navigation.fragment.ktx.v276)
+    implementation (libs.androidx.navigation.ui.ktx.v276)
+    implementation (libs.androidx.navigation.fragment.ktx.v260)
+
 
 
 
