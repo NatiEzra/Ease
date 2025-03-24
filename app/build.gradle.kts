@@ -6,8 +6,11 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
     id("androidx.navigation.safeargs.kotlin")
+    id ("kotlin-kapt")
+
 
 }
+val room_version = "2.6.1"
 val secretsPropertiesFile = rootProject.file("secrets.properties")
 val secretsProperties =  Properties()
 secretsProperties.load( FileInputStream(secretsPropertiesFile))
@@ -88,6 +91,10 @@ dependencies {
     implementation (libs.androidx.navigation.fragment.ktx.v276)
     implementation (libs.androidx.navigation.ui.ktx.v276)
     implementation (libs.androidx.navigation.fragment.ktx.v260)
+    implementation (libs.androidx.room.runtime)
+    kapt (libs.androidx.room.compiler)
+    implementation (libs.androidx.room.ktx)
+
 
 
 

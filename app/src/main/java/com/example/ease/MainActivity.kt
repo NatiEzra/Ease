@@ -16,14 +16,18 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.ease.model.User
+import com.example.ease.model.local.AppDatabase
+import com.example.ease.model.local.UserEntity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
@@ -126,8 +130,11 @@ class MainActivity : AppCompatActivity() {
         var userServer= User.shared
         userServer.getUser { user ->
             if (user != null) {
-                profileName = user["name"].toString()
-                userEmail = user["email"].toString()
+                val userDao = AppDatabase.getInstance(applicationContext).userDao()
+                lifecycleScope.launch {
+                    userDao.clear() // optional
+                    userDao.insert(UserEntity(email = user["email"].toString(), name = user["name"].toString()))
+                }
             }
         }
 //        val articlesButton=findViewById<ImageView>(R.id.articles_icon)
@@ -140,22 +147,44 @@ class MainActivity : AppCompatActivity() {
     fun MyPostsButtonClicked() {
         navController.navigate(R.id.myPostsFragment)
     }
+    suspend fun getCachedUser(): UserEntity? {
+        return AppDatabase.getInstance(applicationContext).userDao().getCurrentUser()
+    }
+    fun getUserName(callback: (String?) -> Unit) {
+        lifecycleScope.launch {
+            val user = getCachedUser()
+            callback(user?.name)
+        }
+    }
 
-    fun getUserName(): String {
-        return profileName;
+    fun getUserEmail(callback: (String?) -> Unit) {
+        lifecycleScope.launch {
+            val user = getCachedUser()
+            callback(user?.email)
+        }
     }
-    fun getUserEmail(): String {
-        return userEmail;
-    }
-    fun refreshProfile(){
-        var userServer= User.shared
-        userServer.getUser { user ->
-            if (user != null) {
-                profileName = user["name"].toString()
-                userEmail = user["email"].toString()
+//    fun getUserName(): String {
+//        return profileName;
+//    }
+//    fun getUserEmail(): String {
+//        return userEmail;
+//    }
+fun refreshProfile() {
+    val userServer = User.shared
+    userServer.getUser { user ->
+        if (user != null) {
+            val name = user["name"].toString()
+            val email = user["email"].toString()
+
+            // Save to Room
+            lifecycleScope.launch {
+                val userDao = AppDatabase.getInstance(applicationContext).userDao()
+                userDao.clear() // Optional: clear old user
+                userDao.insert(UserEntity(email = email, name = name))
             }
         }
     }
+}
     fun articlesButtonClicked(){
         navController.navigate(R.id.articlesFragment)
     }
