@@ -17,11 +17,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import com.example.ease.model.AuthRepository
 import com.example.ease.model.Model
 import com.example.ease.model.User
+import com.example.ease.model.local.AppDatabase
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -67,8 +70,15 @@ class addPostFragment : Fragment() {
         var postText=view.findViewById<EditText>(R.id.addPostEditText)
         var postButton=view.findViewById<TextView>(R.id.postButton)
         var userServer= User.shared
-        profileName.text = (activity as? MainActivity)?.getUserName()
-        var email = (activity as? MainActivity)?.getUserEmail().toString()
+//        profileName.text = (activity as? MainActivity)?.getUserName()
+        val userDao = AppDatabase.getInstance(requireContext()).userDao()
+        var email=""
+        lifecycleScope.launch {
+            val user = userDao.getCurrentUser()
+            profileName.text = user?.name ?: "Guest"
+             email= user?.email ?: ""
+        }
+//        var email = (activity as? MainActivity)?.getUserEmail().toString()
         var addMediaButton=view.findViewById<TextView>(R.id.addMediaButton)
         var postImage=view.findViewById<ImageView>(R.id.postImage)
         var profileImage=view.findViewById<ImageView>(R.id.profileImage)

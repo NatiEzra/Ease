@@ -54,12 +54,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/home"
             android:layout_gravity="center"
             android:padding="6dp"
             android:adjustViewBounds="true"
             android:maxHeight="40dp"
-            android:maxWidth="40dp" />
+            android:src="@drawable/home" />
 
         <ImageView
             android:id="@+id/articles_icon"
@@ -68,10 +67,10 @@
             android:layout_weight="1"
             android:src="@drawable/articles"
             android:layout_gravity="center"
-            android:padding="6dp"
             android:adjustViewBounds="true"
+            android:maxWidth="40dp"
             android:maxHeight="40dp"
-            android:maxWidth="40dp" />
+             />
 
         <ImageView
             android:id="@+id/my_posts_icon"

@@ -29,6 +29,7 @@ playServicesMaps = "19.1.0"
 navigationFragmentKtx = "2.8.9"
 navigationUiKtx = "2.8.9"
 navigationFragment = "2.8.9"
+roomRuntime = "2.6.1"
 
 [libraries]
 androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
@@ -37,6 +38,9 @@ androidx-navigation-fragment-ktx-v260 = { module = "androidx.navigation:navigati
 androidx-navigation-fragment-ktx-v276 = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtxVersion" }
 androidx-navigation-ui-ktx-v276 = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationUiKtxVersion" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 cloudinary-android = { module = "com.cloudinary:cloudinary-android", version.ref = "cloudinaryAndroid" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }

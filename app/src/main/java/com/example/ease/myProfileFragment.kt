@@ -10,11 +10,14 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ease.model.AuthRepository
 import com.example.ease.model.User
+import com.example.ease.model.local.AppDatabase
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -79,8 +82,14 @@ class myProfileFragment : Fragment() {
         }
         val profileName = view.findViewById<TextView>(R.id.profileName)
         val profileEmail=view.findViewById<TextView>(R.id.profileEmail)
-        profileName.text = (activity as? MainActivity)?.getUserName()
-        profileEmail.text = (activity as? MainActivity)?.getUserEmail()
+//        profileName.text = (activity as? MainActivity)?.getUserName()
+        val userDao = AppDatabase.getInstance(requireContext()).userDao()
+        lifecycleScope.launch {
+            val user = userDao.getCurrentUser()
+            profileName.text = user?.name ?: "Guest"
+            profileEmail.text = user?.email ?: ""
+        }
+//        profileEmail.text = (activity as? MainActivity)?.getUserEmail()
 
 
         return view
