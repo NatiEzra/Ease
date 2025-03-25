@@ -71,13 +71,7 @@ class addPostFragment : Fragment() {
         var postButton=view.findViewById<TextView>(R.id.postButton)
         var userServer= User.shared
 //        profileName.text = (activity as? MainActivity)?.getUserName()
-        val userDao = AppDatabase.getInstance(requireContext()).userDao()
-        var email=""
-        lifecycleScope.launch {
-            val user = userDao.getCurrentUser()
-            profileName.text = user?.name ?: "Guest"
-             email= user?.email ?: ""
-        }
+
 //        var email = (activity as? MainActivity)?.getUserEmail().toString()
         var addMediaButton=view.findViewById<TextView>(R.id.addMediaButton)
         var postImage=view.findViewById<ImageView>(R.id.postImage)
@@ -86,6 +80,29 @@ class addPostFragment : Fragment() {
         deleteImageButton.visibility=View.GONE
         var addedImageToPost: Boolean = false
         var postServer= Model.shared
+
+
+        val userDao = AppDatabase.getInstance(requireContext()).userDao()
+        var email=""
+        var imageUrl : String=""
+        lifecycleScope.launch {
+            val user = userDao.getCurrentUser()
+            profileName.text = user?.name ?: "Guest"
+            email= user?.email ?: ""
+            imageUrl= user?.profileImageUrl ?: ""
+            progressBar.visibility = View.VISIBLE
+            profileImage.visibility=View.GONE
+            if (imageUrl != null && imageUrl.isNotEmpty()) {
+                Picasso.get().load(imageUrl).transform(CropCircleTransformation()).into(profileImage)
+                progressBar.visibility = View.GONE
+                profileImage.visibility=View.VISIBLE
+            }
+            else{
+                progressBar.visibility = View.GONE
+                profileImage.visibility=View.VISIBLE
+            }
+        }
+
 
         postButton.setOnClickListener {
 
@@ -179,19 +196,22 @@ class addPostFragment : Fragment() {
             }
             builder.show()
         }
-        progressBar.visibility = View.VISIBLE
-        profileImage.visibility=View.GONE
-        userServer.getProfileImage { uri ->
-            if (uri != null) {
-                Picasso.get().load(uri).transform(CropCircleTransformation()).into(profileImage)
-                progressBar.visibility = View.GONE
-                profileImage.visibility=View.VISIBLE
-            }
-            else{
-                progressBar.visibility = View.GONE
-                profileImage.visibility=View.VISIBLE
-            }
-        }
+//        progressBar.visibility = View.VISIBLE
+//        profileImage.visibility=View.GONE
+//        userServer.getProfileImage { uri ->
+//            if (uri != null) {
+//                Picasso.get().load(uri).transform(CropCircleTransformation()).into(profileImage)
+//                progressBar.visibility = View.GONE
+//                profileImage.visibility=View.VISIBLE
+//            }
+//            else{
+//                progressBar.visibility = View.GONE
+//                profileImage.visibility=View.VISIBLE
+//            }
+//        }
+
+
+
         if(isEdit){
             postButton.text = "Edit"
             postServer.getPostById(postId!!) { post ->

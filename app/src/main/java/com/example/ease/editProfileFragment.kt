@@ -17,10 +17,14 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.collection.emptyLongSet
+import androidx.lifecycle.lifecycleScope
+import com.example.ease.model.AuthRepository
 import com.example.ease.model.Model
 import com.example.ease.model.User
+import com.example.ease.model.local.AppDatabase
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -60,6 +64,7 @@ class editProfileFragment : Fragment() {
         var profileImage = view.findViewById<ImageView>(R.id.profileImage)
         var addedImageToProfile: Boolean = false
         var saveButton = view.findViewById<Button>(R.id.saveButton)
+        val currentPassword=view.findViewById<EditText>(R.id.editProfileVerifyPassword)
         var userServer= User.shared
         cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
             //binding?.imageView?.setImageBitmap(bitmap)
@@ -74,7 +79,7 @@ class editProfileFragment : Fragment() {
 
         galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri != null) {
-                profileImage.setImageURI(uri)
+                Picasso.get().load(uri).transform(CropCircleTransformation()).into(profileImage)
                 addedImageToProfile = true
             }
         }
@@ -115,6 +120,7 @@ class editProfileFragment : Fragment() {
                 profileImage.isDrawingCacheEnabled = true
                 profileImage.buildDrawingCache()
                 userServer.editUser(
+                    currentPassword.text.toString(),
                     editProfileName.text.toString(),
                     editProfilePassword.text.toString(),
                     bitmap
@@ -136,12 +142,18 @@ class editProfileFragment : Fragment() {
         CancelButtonEditProfile.setOnClickListener {
             (activity as? MainActivity)?.myProfilePageButtonClicked()
         }
-
+        val userDao = AppDatabase.getInstance(requireContext()).userDao()
+        lifecycleScope.launch {
+            val user = userDao.getCurrentUser()
+            val imageUrl = user?.profileImageUrl
+            Picasso.get().load(imageUrl).transform(CropCircleTransformation()).into(profileImage)
+        }
+        /*
         userServer.getProfileImage { uri ->
             if (uri != null) {
                 Picasso.get().load(uri).transform(CropCircleTransformation()).into(profileImage)
             }
-        }
+        }*/
 
 
 

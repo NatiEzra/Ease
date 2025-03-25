@@ -74,6 +74,23 @@
 
 
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Verify Current Password"
+            android:textSize="16sp"
+            android:textColor="?android:textColorSecondary" />
+
+        <EditText
+            android:id="@+id/editProfileVerifyPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter your current password"
+            android:inputType="textPassword"
+            android:background="?android:attr/editTextBackground"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
         <!-- סיסמה -->
         <TextView
             android:layout_width="match_parent"

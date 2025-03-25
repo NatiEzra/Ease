@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                 val userDao = AppDatabase.getInstance(applicationContext).userDao()
                 lifecycleScope.launch {
                     userDao.clear() // optional
-                    userDao.insert(UserEntity(email = user["email"].toString(), name = user["name"].toString()))
+                    userDao.insert(UserEntity(email = user["email"].toString(), name = user["name"].toString(), profileImageUrl = user["image"] as? String))
                 }
             }
         }
@@ -175,12 +175,13 @@ fun refreshProfile() {
         if (user != null) {
             val name = user["name"].toString()
             val email = user["email"].toString()
+            val image= user["image"] as? String
 
             // Save to Room
             lifecycleScope.launch {
                 val userDao = AppDatabase.getInstance(applicationContext).userDao()
                 userDao.clear() // Optional: clear old user
-                userDao.insert(UserEntity(email = email, name = name))
+                userDao.insert(UserEntity(email = email, name = name, profileImageUrl = image))
             }
         }
     }

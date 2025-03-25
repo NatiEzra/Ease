@@ -56,9 +56,28 @@ class myProfileFragment : Fragment() {
         val profileImage = view.findViewById<ImageView>(R.id.profileImage)
         progressBar = view.findViewById(R.id.profileImageProgressBar)
         val userServer = User.shared
+        val profileName = view.findViewById<TextView>(R.id.profileName)
+        val profileEmail=view.findViewById<TextView>(R.id.profileEmail)
+//        profileName.text = (activity as? MainActivity)?.getUserName()
+        val userDao = AppDatabase.getInstance(requireContext()).userDao()
         progressBar.visibility = View.VISIBLE
         profileImage.visibility=View.GONE
-        userServer.getProfileImage { uri ->
+        lifecycleScope.launch {
+            val user = userDao.getCurrentUser()
+            profileName.text = user?.name ?: "Guest"
+            profileEmail.text = user?.email ?: ""
+            val imageUrl = user?.profileImageUrl
+            if (imageUrl != null){
+                Picasso.get().load(imageUrl).transform(CropCircleTransformation()).into(profileImage)
+            }
+            else{
+                profileImage.setImageResource(R.drawable.account)
+            }
+
+            progressBar.visibility = View.GONE
+            profileImage.visibility=View.VISIBLE
+        }
+            /* userServer.getProfileImage { uri ->
             if (uri != null) {
 
                 Picasso.get().load(uri).transform(CropCircleTransformation()).into(profileImage)
@@ -71,24 +90,19 @@ class myProfileFragment : Fragment() {
                 profileImage.visibility=View.VISIBLE
 
             }
-        }
+        }*/
 
         val logOutbtn=view.findViewById<Button>(R.id.logoutButton)
         val authServer=AuthRepository.shared
         logOutbtn.setOnClickListener {
+            lifecycleScope.launch {
+                AppDatabase.getInstance(requireContext()).userDao().clear()
+            }
             authServer.signOut()
             Toast.makeText(context,"You logged out, have a great day", Toast.LENGTH_LONG).show()
             (activity as? MainActivity)?.navigateToLogin()
         }
-        val profileName = view.findViewById<TextView>(R.id.profileName)
-        val profileEmail=view.findViewById<TextView>(R.id.profileEmail)
-//        profileName.text = (activity as? MainActivity)?.getUserName()
-        val userDao = AppDatabase.getInstance(requireContext()).userDao()
-        lifecycleScope.launch {
-            val user = userDao.getCurrentUser()
-            profileName.text = user?.name ?: "Guest"
-            profileEmail.text = user?.email ?: ""
-        }
+
 //        profileEmail.text = (activity as? MainActivity)?.getUserEmail()
 
 
