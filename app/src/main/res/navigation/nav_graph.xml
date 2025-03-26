@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/feedFragment"
-        android:name="com.example.ease.FeedFragment"
+        android:name="com.example.ease.ui.posts.FeedFragment"
         android:label="Feed" >
         <action
             android:id="@+id/action_feedFragment_to_addPostFragment"
@@ -25,7 +25,7 @@
 
     <fragment
         android:id="@+id/addPostFragment"
-        android:name="com.example.ease.addPostFragment"
+        android:name="com.example.ease.ui.posts.addPostFragment"
         android:label="Add Post">
         <argument
             android:name="isEdit"
@@ -52,7 +52,7 @@
 
     <fragment
         android:id="@+id/myPostsFragment"
-        android:name="com.example.ease.MyPostsFragment"
+        android:name="com.example.ease.ui.posts.MyPostsFragment"
         android:label="My Posts" >
         <action
             android:id="@+id/action_myPostsFragment_to_addPostFragment"
@@ -67,7 +67,7 @@
 
     <fragment
         android:id="@+id/myProfileFragment"
-        android:name="com.example.ease.myProfileFragment"
+        android:name="com.example.ease.ui.auth.myProfileFragment"
         android:label="My Profile" >
         <action
             android:id="@+id/action_myProfileFragment_to_editProfileFragment"
@@ -88,7 +88,7 @@
 
     <fragment
         android:id="@+id/articlesFragment"
-        android:name="com.example.ease.articlesFragment"
+        android:name="com.example.ease.ui.rest_apis.articlesFragment"
         android:label="Articles" >
         <action
             android:id="@+id/action_articlesFragment_to_addPostFragment"
@@ -106,7 +106,7 @@
 
     <fragment
         android:id="@+id/editProfileFragment"
-        android:name="com.example.ease.editProfileFragment"
+        android:name="com.example.ease.ui.auth.editProfileFragment"
         android:label="Edit Profile" >
         <action
             android:id="@+id/action_editProfileFragment_to_feedFragment"

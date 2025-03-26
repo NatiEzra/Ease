@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginRegisterActivity">
+    tools:context=".ui.activities.LoginRegisterActivity">
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
@@ -13,13 +13,13 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_register"
-            android:name="com.example.ease.RegisterFragment"
+            android:name="com.example.ease.ui.auth.RegisterFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_login"
-            android:name="com.example.ease.loginFragment"
+            android:name="com.example.ease.ui.auth.loginFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

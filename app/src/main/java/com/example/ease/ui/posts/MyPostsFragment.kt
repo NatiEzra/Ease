@@ -1,29 +1,30 @@
-package com.example.ease
+package com.example.ease.ui.posts
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.ease.model.Model
+import com.example.ease.ui.activities.MainActivity
+import com.example.ease.R
+import com.example.ease.model.PostModel
 import com.example.ease.model.Post
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import java.text.SimpleDateFormat
 import java.util.Locale
-import com.example.ease.FeedFragment
 import com.example.ease.base.MyApplication.Globals.context
+import com.example.ease.viewmodel.PostViewModel
 
-class MyPostsViewHolder (itemView: View, private val onEditClick: (String) -> Unit): RecyclerView.ViewHolder(itemView) {
+class MyPostsViewHolder (itemView: View, private val onEditClick: (String) -> Unit, private val onDeleteClick: (String) -> Unit ) : RecyclerView.ViewHolder(itemView) {
     var profileNameTextView: TextView? = null
     var postTextView: TextView? = null
     var imageProfile: ImageView? = null
@@ -31,6 +32,7 @@ class MyPostsViewHolder (itemView: View, private val onEditClick: (String) -> Un
     var imagePost: ImageView? = null
     var editButton: ImageView? = null
     var deleteButton: ImageView? = null
+
 
 
 
@@ -82,19 +84,14 @@ class MyPostsViewHolder (itemView: View, private val onEditClick: (String) -> Un
         editButton?.setOnClickListener(){
             onEditClick(post.postId)
         }
+
         deleteButton?.setOnClickListener {
+
             AlertDialog.Builder(itemView.context)
                 .setTitle("Delete Post")
                 .setMessage("Are you sure you want to delete this post?")
                 .setPositiveButton("Yes") { dialog, _ ->
-                    Model.shared.deletePost(post.postId) { success, error ->
-                        if (success) {
-                            Toast.makeText(context, "Your post was deleted successfully!", Toast.LENGTH_LONG).show()
-                            (itemView.context as? MainActivity)?.MyPostsButtonClicked()
-                        } else {
-                            Toast.makeText(context, "Connection failed", Toast.LENGTH_LONG).show()
-                        }
-                    }
+                    onDeleteClick(post.postId)
                     dialog.dismiss()
                 }
                 .setNegativeButton("Cancel") { dialog, _ ->
@@ -110,7 +107,7 @@ class MyPostsViewHolder (itemView: View, private val onEditClick: (String) -> Un
 
 }
 
-class MyPostRecycleAdapter(private var posts : List<Post>?, private val onEditClick: (String) -> Unit): RecyclerView.Adapter<MyPostsViewHolder>() {
+class MyPostRecycleAdapter(private var posts : List<Post>?, private val onEditClick: (String) -> Unit,  private val onDeleteClick: (String) -> Unit): RecyclerView.Adapter<MyPostsViewHolder>() {
     override fun getItemCount(): Int {
         return posts?.size ?: 0
     }
@@ -122,7 +119,7 @@ class MyPostRecycleAdapter(private var posts : List<Post>?, private val onEditCl
         val inflation=LayoutInflater.from(parent.context)
         val view = inflation.inflate(R.layout.my_post_row, parent, false)
 
-        return MyPostsViewHolder(view, onEditClick);
+        return MyPostsViewHolder(view, onEditClick, onDeleteClick);
     }
 
 
@@ -139,8 +136,10 @@ class MyPostRecycleAdapter(private var posts : List<Post>?, private val onEditCl
 class MyPostsFragment : Fragment() {
     var adapter: MyPostRecycleAdapter? = null
     var posts: MutableList<Post> = ArrayList()
+    val postViewModel: PostViewModel by viewModels()
     private lateinit var progressBar: ProgressBar
     private lateinit var recyclerView: RecyclerView
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -152,19 +151,34 @@ class MyPostsFragment : Fragment() {
 
         progressBar.visibility = View.GONE
         recyclerView.visibility = View.VISIBLE
-        posts = Model.shared.posts
+        //posts = PostModel.shared.posts
         recyclerView.setHasFixedSize(true)
 
         val layoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = layoutManager
 
-        adapter = MyPostRecycleAdapter(posts){postId->
-            editPostButtonClicked(postId)
-        }
+        adapter = MyPostRecycleAdapter(
+            posts,
+            onEditClick = { postId -> editPostButtonClicked(postId) },
+            onDeleteClick = { postId -> confirmDelete(postId) } // ✅
+        )
         recyclerView.adapter = adapter
         getMyPosts()
 
         return view
+    }
+
+    private fun confirmDelete(postId: String) {
+        postViewModel.deletePost(postId)
+        postViewModel.postOperationState.observe(viewLifecycleOwner) { result ->
+            result.onSuccess {
+                Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show()
+                getMyPosts()
+            }
+            result.onFailure {
+                Toast.makeText(context, "Failed to delete post", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onResume() {
@@ -179,16 +193,16 @@ class MyPostsFragment : Fragment() {
     }
 
     private fun getMyPosts() {
-
-        Model.shared.getMyposts { fetchedPosts ->
-            // Ensure posts are updated only after fetching data from the database
+        postViewModel.fetchMyPosts()
+        postViewModel.myPosts.observe(viewLifecycleOwner) { fetchedPosts ->
             posts.clear()
             posts.addAll(fetchedPosts)
-
             adapter?.set(posts)
             adapter?.notifyDataSetChanged()
             //progressBar.visibility = View.GONE
-           // recyclerView.visibility = View.VISIBLE
+            //recyclerView.visibility = View.VISIBLE
         }
     }
+
+
 }

@@ -1,6 +1,5 @@
-package com.example.ease
+package com.example.ease.ui.auth
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,14 +9,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import androidx.lifecycle.ViewModelProvider
+import com.example.ease.ui.activities.LoginRegisterActivity
+import com.example.ease.R
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.example.ease.model.AuthRepository
+import com.example.ease.repositories.AuthRepository
+import com.example.ease.viewmodel.AuthViewModel
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -37,6 +35,8 @@ class loginFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    private lateinit var viewModel: AuthViewModel
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,6 +79,17 @@ class loginFragment : Fragment() {
         emailField = view.findViewById(R.id.email_field_login)
         passwordField = view.findViewById(R.id.password_field)
         loginButton = view.findViewById(R.id.login_button)
+        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+
+        viewModel.authState.observe(viewLifecycleOwner) { result ->
+            result.onSuccess {
+                Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
+                (activity as? LoginRegisterActivity)?.navigateToHome()
+            }.onFailure {
+                Toast.makeText(requireContext(), it.message ?: "Login failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+
 
         setupListeners()
 
@@ -90,64 +101,54 @@ class loginFragment : Fragment() {
 
     private fun setupListeners() {
 
-        var server=AuthRepository.shared
         loginButton.setOnClickListener {
             val email = emailField.text.toString()
             val password = passwordField.text.toString()
 
-            if (email.isEmpty() || password.isEmpty()) {
+            if (email.isBlank() || password.isBlank()) {
                 Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            } else {
+                viewModel.login(email, password)
             }
-            server.loginUser(email, password) { success, error ->
-                if (success) {
-                    Toast.makeText(requireContext(), "Login Successful", Toast.LENGTH_SHORT).show()
-                    (activity as? LoginRegisterActivity)?.navigateToHome()
-                } else {
-                    Toast.makeText(requireContext(), error ?: "Login failed", Toast.LENGTH_SHORT).show()
-                }
         }
 
+        /*
+            private fun signInWithGoogle() {
+                val signInIntent = googleSignInClient.signInIntent
+                startActivityForResult(signInIntent, RC_SIGN_IN)
+            }
 
-    }
+            override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+                super.onActivityResult(requestCode, resultCode, data)
 
-/*
-    private fun signInWithGoogle() {
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleSignInResult(task)
-        }
-    }
-
-    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
-        try {
-            val account = completedTask.getResult(ApiException::class.java)
-            // Signed in successfully, show authenticated UI.
-        } catch (e: ApiException) {
-            // Sign in failed, handle the error
-        }
-    }
-
-    companion object {
-        private const val RC_SIGN_IN = 9001
-
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            loginFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                if (requestCode == RC_SIGN_IN) {
+                    val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+                    handleSignInResult(task)
                 }
             }
 
- */
+            private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+                try {
+                    val account = completedTask.getResult(ApiException::class.java)
+                    // Signed in successfully, show authenticated UI.
+                } catch (e: ApiException) {
+                    // Sign in failed, handle the error
+                }
+            }
+
+            companion object {
+                private const val RC_SIGN_IN = 9001
+
+                @JvmStatic
+                fun newInstance(param1: String, param2: String) =
+                    loginFragment().apply {
+                        arguments = Bundle().apply {
+                            putString(ARG_PARAM1, param1)
+                            putString(ARG_PARAM2, param2)
+                        }
+                    }
+
+         */
     }
 
 

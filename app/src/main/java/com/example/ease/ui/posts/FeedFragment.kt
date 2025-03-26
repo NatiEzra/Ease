@@ -1,8 +1,7 @@
-package com.example.ease
+package com.example.ease.ui.posts
 
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -10,15 +9,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.ease.model.Model
+import com.example.ease.R
+import com.example.ease.model.PostModel
 import com.example.ease.model.Post
+import com.example.ease.viewmodel.PostViewModel
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import java.text.SimpleDateFormat
@@ -30,6 +31,7 @@ class PostsViewHolder (itemView: View): RecyclerView.ViewHolder(itemView) {
     var imageProfile: ImageView? = null
     var dateTextView: TextView? = null
     var imagePost: ImageView? = null
+
 
 
 
@@ -137,20 +139,29 @@ class PostRecycleAdapter(private var posts : List<Post>?): RecyclerView.Adapter<
 
 class FeedFragment : Fragment() {
     //var adapter: PostRecycleAdapter? = null
-    var adapter = PostRecycleAdapter(Model.shared.posts)
+    var adapter = PostRecycleAdapter(PostModel.shared.posts)
     var posts: MutableList<Post> = ArrayList()
     private lateinit var progressBar: ProgressBar
     private lateinit var  recyclerView: RecyclerView
+    val postViewModel: PostViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         var view = inflater.inflate(R.layout.fragment_feed, container, false)
+        postViewModel.posts.observe(viewLifecycleOwner) { fetchedPosts ->
+            posts.clear()
+            posts.addAll(fetchedPosts)
+            adapter?.set(posts)
+            adapter?.notifyDataSetChanged()
+            progressBar.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
+        }
+
+
 
         progressBar = view.findViewById(R.id.feedProgressBar)
-
-        posts = Model.shared.posts
 
         recyclerView = view.findViewById(R.id.fragment_feed_recycler_view)
         recyclerView.setHasFixedSize(true)
@@ -174,16 +185,7 @@ class FeedFragment : Fragment() {
 
     private fun getAllPosts() {
 
-        Model.shared.getPosts { fetchedPosts ->
-            // Ensure posts are updated only after fetching data from the database
+        postViewModel.fetchAllPosts()
 
-            posts.clear()
-            posts.addAll(fetchedPosts)
-
-            adapter?.set(posts)
-            adapter?.notifyDataSetChanged()
-            progressBar.visibility = View.GONE
-            recyclerView.visibility = View.VISIBLE
-        }
     }
 }

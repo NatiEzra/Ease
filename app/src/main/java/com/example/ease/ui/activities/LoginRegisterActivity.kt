@@ -1,18 +1,20 @@
-package com.example.ease
+package com.example.ease.ui.activities
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.ease.model.AuthRepository
+import com.example.ease.R
+import com.example.ease.repositories.AuthRepository
+import com.example.ease.ui.auth.RegisterFragment
+import com.example.ease.ui.auth.loginFragment
 
 
 class LoginRegisterActivity : AppCompatActivity() {
-    var authServer=AuthRepository.shared
+    var authServer= AuthRepository.shared
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {

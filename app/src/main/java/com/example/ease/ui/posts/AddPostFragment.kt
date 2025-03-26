@@ -1,4 +1,4 @@
-package com.example.ease
+package com.example.ease.ui.posts
 
 import android.app.AlertDialog
 import android.graphics.Bitmap
@@ -17,11 +17,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.ease.model.AuthRepository
-import com.example.ease.model.Model
+import com.example.ease.ui.activities.MainActivity
+import com.example.ease.R
+import com.example.ease.model.PostModel
 import com.example.ease.model.User
 import com.example.ease.model.local.AppDatabase
+import com.example.ease.viewmodel.PostViewModel
+import com.example.ease.viewmodel.UserViewModel
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import kotlinx.coroutines.launch
@@ -47,6 +51,7 @@ class addPostFragment : Fragment() {
     private var cameraLauncher: ActivityResultLauncher<Void?>? = null
     private var galleryLauncher: ActivityResultLauncher<String>? = null
     private lateinit var progressBar: ProgressBar
+    private lateinit var progressBarFragment: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,8 +74,10 @@ class addPostFragment : Fragment() {
         progressBar = view.findViewById(R.id.profileImageAddPostProgressBar)
         var postText=view.findViewById<EditText>(R.id.addPostEditText)
         var postButton=view.findViewById<TextView>(R.id.postButton)
-        var userServer= User.shared
+        val userViewModel: UserViewModel by viewModels()
 //        profileName.text = (activity as? MainActivity)?.getUserName()
+        progressBarFragment=view.findViewById<ProgressBar>(R.id.addPostProgressBar)
+
 
 //        var email = (activity as? MainActivity)?.getUserEmail().toString()
         var addMediaButton=view.findViewById<TextView>(R.id.addMediaButton)
@@ -79,7 +86,7 @@ class addPostFragment : Fragment() {
         var deleteImageButton=view.findViewById<ImageButton>(R.id.deleteImageButton)
         deleteImageButton.visibility=View.GONE
         var addedImageToPost: Boolean = false
-        var postServer= Model.shared
+        val postViewModel: PostViewModel by viewModels()
 
 
         val userDao = AppDatabase.getInstance(requireContext()).userDao()
@@ -105,47 +112,44 @@ class addPostFragment : Fragment() {
 
 
         postButton.setOnClickListener {
-
+            progressBarFragment.visibility = View.VISIBLE
 
             var postTextString=postText.text.toString()
             if(postTextString.isNotEmpty()){
                 if (addedImageToPost){
+
+
                     postImage.isDrawingCacheEnabled = true
                     postImage.buildDrawingCache()
                     val bitmap = (postImage.drawable as BitmapDrawable).bitmap
-                    Model.shared.addPost(email,bitmap ,postTextString){ success, error ->
-                        if (success) {
-                            postText.text.clear()
-                            Toast.makeText(context,"Your post was shared successfully!",Toast.LENGTH_LONG).show()
-                            (activity as? MainActivity)?.homePageButtonClicked()
 
-                        } else {
-                            // Handle the error
-                            Toast.makeText(context,"Connection failed",Toast.LENGTH_LONG).show()
+                    postViewModel.createPost(bitmap ,postTextString)
 
-                        }
-                    }
+
                     postText.text.clear()
                 }
                 else{
-                    Model.shared.addPost(email,null ,postTextString){ success, error ->
-                        if (success) {
-                            postText.text.clear()
-                            Toast.makeText(context,"Your post was shared successfully!",Toast.LENGTH_LONG).show()
-                            (activity as? MainActivity)?.homePageButtonClicked()
+                    postViewModel.createPost(null ,postTextString)
 
-                        } else {
-                            // Handle the error
-                            Toast.makeText(context,"Connection failed",Toast.LENGTH_LONG).show()
-
-                        }
-                    }
                     postText.text.clear()
                 }
 
             }
             else{
                 Toast.makeText(context,"Post empty is invalid",Toast.LENGTH_LONG).show()
+            }
+        }
+
+        postViewModel.postOperationState.observe(viewLifecycleOwner) { result ->
+            result.onSuccess {
+                postText.text.clear()
+                Toast.makeText(context, "Your post was shared successfully!", Toast.LENGTH_LONG).show()
+                (activity as? MainActivity)?.homePageButtonClicked()
+                progressBarFragment.visibility = View.GONE
+            }
+            result.onFailure {
+                Toast.makeText(context, "Connection failed", Toast.LENGTH_LONG).show()
+                progressBarFragment.visibility = View.GONE
             }
         }
         cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
@@ -214,21 +218,24 @@ class addPostFragment : Fragment() {
 
         if(isEdit){
             postButton.text = "Edit"
-            postServer.getPostById(postId!!) { post ->
+            postViewModel.getPostById(postId!!)
+            postViewModel.singlePost.observe(viewLifecycleOwner) { post ->
                 post?.let {
                     postText.setText(it.textPost)
+
                     if (it.imagePost.isNotEmpty()) {
                         deleteImageButton.visibility = View.VISIBLE
                         Picasso.get()
                             .load(it.imagePost)
-                            .resize(200, 200) // Resize to max 200x200
-                            .centerInside() // Maintain aspect ratio
+                            .resize(200, 200)
+                            .centerInside()
                             .into(postImage)
 
                         addedImageToPost = true
                     }
                 }
             }
+
 
             postButton.setOnClickListener(){
                 var postTextString=postText.text.toString()
@@ -237,33 +244,14 @@ class addPostFragment : Fragment() {
                         postImage.isDrawingCacheEnabled = true
                         postImage.buildDrawingCache()
                         val bitmap = (postImage.drawable as BitmapDrawable).bitmap
-                        Model.shared.editPost(postId?:"" ,bitmap ,postTextString){ success, error ->
-                            if (success) {
-                                postText.text.clear()
-                                Toast.makeText(context,"Your post was updated successfully!",Toast.LENGTH_LONG).show()
-                                (activity as? MainActivity)?.MyPostsButtonClicked()
+                        postViewModel.updatePost(postId?:"" ,bitmap ,postTextString)
 
-                            } else {
-                                // Handle the error
-                                Toast.makeText(context,"Connection failed",Toast.LENGTH_LONG).show()
 
-                            }
-                        }
                         postText.text.clear()
                     }
                     else{
-                        Model.shared.editPost(postId?:"",null ,postTextString){ success, error ->
-                            if (success) {
-                                postText.text.clear()
-                                Toast.makeText(context,"Your post was updated successfully!",Toast.LENGTH_LONG).show()
-                                (activity as? MainActivity)?.MyPostsButtonClicked()
+                        postViewModel.updatePost(postId?:"",null ,postTextString)
 
-                            } else {
-                                // Handle the error
-                                Toast.makeText(context,"Connection failed",Toast.LENGTH_LONG).show()
-
-                            }
-                        }
                         postText.text.clear()
                     }
 
@@ -272,6 +260,18 @@ class addPostFragment : Fragment() {
                     Toast.makeText(context,"Post empty is invalid",Toast.LENGTH_LONG).show()
                 }
 
+            }
+
+
+            postViewModel.postOperationState.observe(viewLifecycleOwner) { result ->
+                result.onSuccess {
+                    postText.text.clear()
+                    Toast.makeText(context, "Your post was updated successfully!", Toast.LENGTH_LONG).show()
+                    (activity as? MainActivity)?.MyPostsButtonClicked()
+                }
+                result.onFailure {
+                    Toast.makeText(context, "Connection failed", Toast.LENGTH_LONG).show()
+                }
             }
 
 

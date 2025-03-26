@@ -1,12 +1,10 @@
 package com.example.ease.model
 
 import android.graphics.Bitmap
-import android.provider.ContactsContract.Profile
 import android.util.Log
+import com.example.ease.repositories.AuthRepository
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 
 data class Post(
@@ -19,7 +17,7 @@ data class Post(
 
     )
 
-class Model  private constructor(){
+class PostModel  private constructor(){
     val db= Firebase.firestore
     @Volatile
     var posts: MutableList<Post> = mutableListOf()
@@ -28,7 +26,7 @@ class Model  private constructor(){
     val authServer= AuthRepository.shared
 
     companion object{
-        val shared =Model()
+        val shared =PostModel()
     }
     init {
         getPosts { retrievedPosts ->

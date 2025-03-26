@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/fragment_feed"
-    tools:context=".FeedFragment"
+    tools:context=".ui.posts.FeedFragment"
     android:fillViewport="true">
 
     <FrameLayout
