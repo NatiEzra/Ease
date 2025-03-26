@@ -1,4 +1,4 @@
-package com.example.ease
+package com.example.ease.ui.auth
 
 import android.app.AlertDialog
 import android.graphics.Bitmap
@@ -13,15 +13,17 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.collection.emptyLongSet
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.ease.model.AuthRepository
-import com.example.ease.model.Model
+import com.example.ease.ui.activities.MainActivity
+import com.example.ease.R
 import com.example.ease.model.User
 import com.example.ease.model.local.AppDatabase
+import com.example.ease.viewmodel.UserViewModel
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import kotlinx.coroutines.launch
@@ -45,6 +47,7 @@ class editProfileFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +68,9 @@ class editProfileFragment : Fragment() {
         var addedImageToProfile: Boolean = false
         var saveButton = view.findViewById<Button>(R.id.saveButton)
         val currentPassword=view.findViewById<EditText>(R.id.editProfileVerifyPassword)
-        var userServer= User.shared
+        progressBar = view.findViewById(R.id.editProfileProgressBar)
+
+        val userViewModel: UserViewModel by viewModels()
         cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
             //binding?.imageView?.setImageBitmap(bitmap)
             if (bitmap != null) {
@@ -100,6 +105,7 @@ class editProfileFragment : Fragment() {
         val editProfilePassword=view.findViewById<EditText>(R.id.editProfilePassword)
         val editProfileName=view.findViewById<EditText>(R.id.editProfileName)
         val editProfileConfirmPass=view.findViewById<EditText>(R.id.editProfileConfirmPassword)
+
         saveButton.setOnClickListener {
 
             val bitmap: Bitmap?
@@ -113,29 +119,35 @@ class editProfileFragment : Fragment() {
             if(editProfilePassword.text.toString()!=editProfileConfirmPass.text.toString()){
                 Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
             }
+            else if(currentPassword.text.toString().length==0){
+                Toast.makeText(context, "Please enter your current password", Toast.LENGTH_SHORT).show()
+            }
             else if(editProfilePassword.text.toString().length<6 && editProfilePassword.text.toString().isNotEmpty()){
                 Toast.makeText(context, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
             }
             else {
+                progressBar.visibility = View.VISIBLE
                 profileImage.isDrawingCacheEnabled = true
                 profileImage.buildDrawingCache()
-                userServer.editUser(
+                userViewModel.editUser(
                     currentPassword.text.toString(),
                     editProfileName.text.toString(),
                     editProfilePassword.text.toString(),
                     bitmap
-                ) { success, error ->
-                    if (success) {
-                        Toast.makeText(context, "Profile updated", Toast.LENGTH_SHORT).show()
-                        (activity as? MainActivity)?.refreshProfile()
-                        (activity as? MainActivity)?.homePageButtonClicked()
+                )
 
 
+            }
 
-                    } else {
-                        Toast.makeText(context, "Error: $error", Toast.LENGTH_SHORT).show()
-                    }
-                }
+        }
+
+        userViewModel.editUserResult.observe(viewLifecycleOwner) { result ->
+            result.onSuccess {
+                Toast.makeText(context, "Profile updated", Toast.LENGTH_SHORT).show()
+                (activity as? MainActivity)?.refreshProfile()
+                (activity as? MainActivity)?.homePageButtonClicked()
+            }.onFailure {
+                Toast.makeText(context, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
             }
         }
         val CancelButtonEditProfile=view.findViewById<Button>(R.id.CancelButtonEditProfile)
@@ -146,7 +158,12 @@ class editProfileFragment : Fragment() {
         lifecycleScope.launch {
             val user = userDao.getCurrentUser()
             val imageUrl = user?.profileImageUrl
-            Picasso.get().load(imageUrl).transform(CropCircleTransformation()).into(profileImage)
+            if (imageUrl != null){
+                Picasso.get().load(imageUrl).transform(CropCircleTransformation()).into(profileImage)
+            }
+            else{
+                profileImage.setImageResource(R.drawable.account)
+            }
         }
         /*
         userServer.getProfileImage { uri ->

@@ -1,32 +1,28 @@
-package com.example.ease
+package com.example.ease.ui.activities
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.setupWithNavController
+import com.example.ease.R
 import com.example.ease.model.User
 import com.example.ease.model.local.AppDatabase
 import com.example.ease.model.local.UserEntity
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.example.ease.ui.auth.editProfileFragmentDirections
+import com.example.ease.ui.auth.myProfileFragmentDirections
+import com.example.ease.ui.posts.FeedFragmentDirections
+import com.example.ease.ui.posts.MyPostsFragmentDirections
+import com.example.ease.ui.rest_apis.articlesFragmentDirections
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {

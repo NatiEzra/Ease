@@ -1,4 +1,4 @@
-package com.example.ease
+package com.example.ease.ui.auth
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -10,11 +10,15 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
-import com.example.ease.model.AuthRepository
+import com.example.ease.ui.activities.MainActivity
+import com.example.ease.R
+import com.example.ease.repositories.AuthRepository
 import com.example.ease.model.User
 import com.example.ease.model.local.AppDatabase
+import com.example.ease.viewmodel.AuthViewModel
+import com.example.ease.viewmodel.UserViewModel
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import kotlinx.coroutines.launch
@@ -55,7 +59,7 @@ class myProfileFragment : Fragment() {
 
         val profileImage = view.findViewById<ImageView>(R.id.profileImage)
         progressBar = view.findViewById(R.id.profileImageProgressBar)
-        val userServer = User.shared
+        val userViewModel: UserViewModel by viewModels()
         val profileName = view.findViewById<TextView>(R.id.profileName)
         val profileEmail=view.findViewById<TextView>(R.id.profileEmail)
 //        profileName.text = (activity as? MainActivity)?.getUserName()
@@ -93,12 +97,12 @@ class myProfileFragment : Fragment() {
         }*/
 
         val logOutbtn=view.findViewById<Button>(R.id.logoutButton)
-        val authServer=AuthRepository.shared
+        val autViewModel: AuthViewModel by viewModels()
         logOutbtn.setOnClickListener {
             lifecycleScope.launch {
                 AppDatabase.getInstance(requireContext()).userDao().clear()
             }
-            authServer.signOut()
+            autViewModel.signOut()
             Toast.makeText(context,"You logged out, have a great day", Toast.LENGTH_LONG).show()
             (activity as? MainActivity)?.navigateToLogin()
         }

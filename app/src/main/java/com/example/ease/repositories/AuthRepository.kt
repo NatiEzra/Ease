@@ -1,11 +1,11 @@
-package com.example.ease.model
+package com.example.ease.repositories
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
 class AuthRepository {
     companion object{
-        val shared =AuthRepository()
+        val shared = AuthRepository()
     }
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 

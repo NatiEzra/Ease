@@ -1,4 +1,4 @@
-package com.example.ease
+package com.example.ease.ui.auth
 
 import android.app.AlertDialog
 import android.graphics.Bitmap
@@ -18,8 +18,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import com.example.ease.model.AuthRepository
+import androidx.fragment.app.viewModels
+import com.example.ease.ui.activities.LoginRegisterActivity
+import com.example.ease.R
+import com.example.ease.repositories.AuthRepository
 import com.example.ease.model.User
+import com.example.ease.viewmodel.AuthViewModel
+import com.example.ease.viewmodel.UserViewModel
 import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 
@@ -47,6 +52,12 @@ class RegisterFragment : Fragment() {
     private var cameraLauncher: ActivityResultLauncher<Void?>? = null
     private var galleryLauncher: ActivityResultLauncher<String>? = null
     private var addedProfileImage: Boolean=false
+    private val authViewModel: AuthViewModel by viewModels()
+    private val userViewModel: UserViewModel by viewModels()
+
+
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,14 +92,40 @@ class RegisterFragment : Fragment() {
         name = view.findViewById(R.id.username_field)
         editIcon = view.findViewById<ImageView>(R.id.edit_profile_image_icon)
         profileImage = view.findViewById<ImageView>(R.id.profile_image_register)
+        authViewModel.authState.observe(viewLifecycleOwner) { result ->
+            result.onSuccess {
+                // Registration successful → now create Firestore user
+                val bitmap = if (addedProfileImage) {
+                    (profileImage.drawable as BitmapDrawable).bitmap
+                } else null
+
+                userViewModel.createUser(
+                    name.text.toString(),
+                    emailField.text.toString(),
+                    bitmap
+                )
+            }
+            result.onFailure {
+                Toast.makeText(context, it.message ?: "Registration failed", Toast.LENGTH_SHORT).show()
+                view?.findViewById<ProgressBar>(R.id.registerProgressBar)?.visibility = View.GONE
+            }
+        }
+
+        userViewModel.createUserResult.observe(viewLifecycleOwner) { result ->
+            view?.findViewById<ProgressBar>(R.id.registerProgressBar)?.visibility = View.GONE
+            result.onSuccess {
+                (activity as? LoginRegisterActivity)?.navigateToHome()
+            }
+            result.onFailure {
+                Toast.makeText(context, it.message ?: "Firestore user creation failed", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         setupListeners()
 
     }
 
     private fun setupListeners() {
-        var authServer=AuthRepository.shared
-        var userServer=User.shared
         cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
             //binding?.imageView?.setImageBitmap(bitmap)
             if (bitmap != null) {
@@ -143,22 +180,7 @@ class RegisterFragment : Fragment() {
                 return@setOnClickListener
             }
             progressBar?.visibility = View.VISIBLE
-            authServer.registerUser(email, password) { success, error ->
-                if (success) {
-                    userServer.createUser(username,email, bitmap){success,error->
-                        if (success) {
-                            Log.d("TAG", "User added to database")
-                            (activity as? LoginRegisterActivity)?.navigateToHome()
-                            Log.d("TAG", "User registered successfully ")
-                        } else {
-                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
-                } else {
-                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                }
-            }
+            authViewModel.register(email, password)
 
         }
     }

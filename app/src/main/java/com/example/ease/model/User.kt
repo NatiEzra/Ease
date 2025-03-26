@@ -2,6 +2,7 @@ package com.example.ease.model
 
 import android.graphics.Bitmap
 import android.util.Log
+import com.example.ease.repositories.AuthRepository
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -112,7 +113,7 @@ class User {
 
     fun editUser(currentPassword: String, name: String, password: String, image: Bitmap?, onComplete: (Boolean, String?) -> Unit) {
         val userEmail = auth.currentUser?.email
-        if (userEmail != null) {
+        if (userEmail != null && currentPassword.isNotEmpty()) {
             auth.authenticate(userEmail, currentPassword) { success, error ->
                 if (success) {
                     db.collection("users")
