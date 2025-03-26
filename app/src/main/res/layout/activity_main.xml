@@ -68,8 +68,8 @@
             android:src="@drawable/articles"
             android:layout_gravity="center"
             android:adjustViewBounds="true"
-            android:maxWidth="40dp"
-            android:maxHeight="40dp"
+            android:maxWidth="35dp"
+            android:maxHeight="35dp"
              />
 
         <ImageView

@@ -20,6 +20,9 @@ class PostViewModel(
     private val _myPosts = MutableLiveData<List<Post>>()
     val myPosts: LiveData<List<Post>> get() = _myPosts
 
+    private val _postCreateState = MutableLiveData<Result<Unit>>()
+    val postCreateState: LiveData<Result<Unit>> get() = _postCreateState
+
     private val _postOperationState = MutableLiveData<Result<Unit>>()
     val postOperationState: LiveData<Result<Unit>> get() = _postOperationState
 
@@ -46,8 +49,8 @@ class PostViewModel(
         val email = postModel.authServer.getCurrentUserEmail()
         viewModelScope.launch(Dispatchers.IO) {
             postModel.addPost(email, image, text) { success, error ->
-                if (success) _postOperationState.postValue(Result.success(Unit))
-                else _postOperationState.postValue(Result.failure(Throwable(error)))
+                if (success) _postCreateState.postValue(Result.success(Unit))
+                else _postCreateState.postValue(Result.failure(Throwable(error)))
             }
         }
     }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import com.example.ease.R
 import com.example.ease.model.User
 import com.example.ease.model.local.AppDatabase
@@ -31,8 +33,38 @@ class MainActivity : AppCompatActivity() {
     private var profileName: String = ""
     private var userEmail: String = ""
 
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val currentDestinationId = navController.currentDestination?.id
+                    if (currentDestinationId == R.id.feedFragment) {
+                        // If we're already at feedFragment, close the app
+                        finish()
+                    } else {
+                        // Otherwise navigate to feedFragment and clear intermediate backstack
+                        navController.navigate(
+                            R.id.feedFragment,
+                            null,
+                            navOptions {
+                                popUpTo(R.id.feedFragment) {
+                                    inclusive = false // Keep feedFragment in the stack
+                                }
+                                launchSingleTop = true
+                            }
+                        )
+                    }
+                }
+            }
+        )
+
 
 //        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
 //            override fun handleOnBackPressed() {
@@ -52,34 +84,91 @@ class MainActivity : AppCompatActivity() {
             ?: throw IllegalStateException("NavController not found")
 
         // Set up bottom navigation (if needed)
+        // HOME (Feed)
         findViewById<ImageView>(R.id.home_icon).setOnClickListener {
-            navController.navigate(R.id.feedFragment)
+            // If we are already at Feed, do nothing or re-navigate with pop if you want.
+            if (navController.currentDestination?.id != R.id.feedFragment) {
+                navController.navigate(
+                    R.id.feedFragment,
+                    null,
+                    navOptions {
+                        // Pop everything up to feedFragment so it's the only one on the stack
+                        popUpTo(R.id.feedFragment) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                )
+            }
         }
 
+// ARTICLES
         findViewById<ImageView>(R.id.articles_icon).setOnClickListener {
-            navController.navigate(R.id.articlesFragment)
+            if (navController.currentDestination?.id != R.id.articlesFragment) {
+                navController.navigate(
+                    R.id.articlesFragment,
+                    null,
+                    navOptions {
+                        popUpTo(R.id.feedFragment) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                )
+            }
         }
 
+// MY POSTS
         findViewById<ImageView>(R.id.my_posts_icon).setOnClickListener {
-            navController.navigate(R.id.myPostsFragment)
+            if (navController.currentDestination?.id != R.id.myPostsFragment) {
+                navController.navigate(
+                    R.id.myPostsFragment,
+                    null,
+                    navOptions {
+                        popUpTo(R.id.feedFragment) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                )
+            }
         }
 
+// ADD POST
         findViewById<ImageView>(R.id.add_icon).setOnClickListener {
             val currentDestination = navController.currentDestination?.id
             val action = when (currentDestination) {
-                R.id.feedFragment -> FeedFragmentDirections.actionFeedFragmentToAddPostFragment(isEdit=false, postId = null)
-                R.id.myPostsFragment -> MyPostsFragmentDirections.actionMyPostsFragmentToAddPostFragment(isEdit=false, postId = null)
-                R.id.myProfileFragment -> myProfileFragmentDirections.actionMyProfileFragmentToAddPostFragment(isEdit=false, postId = null)
-                R.id.articlesFragment -> articlesFragmentDirections.actionArticlesFragmentToAddPostFragment(isEdit=false, postId = null)
-                R.id.editProfileFragment -> editProfileFragmentDirections.actionEditProfileFragmentToAddPostFragment(isEdit=false, postId = null)
+                R.id.feedFragment -> FeedFragmentDirections.actionFeedFragmentToAddPostFragment(null, false)
+                R.id.myPostsFragment -> MyPostsFragmentDirections.actionMyPostsFragmentToAddPostFragment(null, false)
+                R.id.myProfileFragment -> myProfileFragmentDirections.actionMyProfileFragmentToAddPostFragment(null, false)
+                R.id.articlesFragment -> articlesFragmentDirections.actionArticlesFragmentToAddPostFragment(null, false)
+                R.id.editProfileFragment -> editProfileFragmentDirections.actionEditProfileFragmentToAddPostFragment(null, false)
                 else -> return@setOnClickListener
             }
-            navController.navigate(action)
+            navController.navigate(action, navOptions {
+                popUpTo(R.id.feedFragment) {
+                    inclusive = false
+                }
+                launchSingleTop = true
+            })
         }
 
+// PROFILE
         findViewById<ImageView>(R.id.profile_icon).setOnClickListener {
-            navController.navigate(R.id.myProfileFragment)
+            if (navController.currentDestination?.id != R.id.myProfileFragment) {
+                navController.navigate(
+                    R.id.myProfileFragment,
+                    null,
+                    navOptions {
+                        popUpTo(R.id.feedFragment) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                )
+            }
         }
+
 
 
         //progressBar = findViewById(R.id.progressBar)
@@ -93,10 +182,10 @@ class MainActivity : AppCompatActivity() {
 
         // הגדרת הפרגמנט הראשוני
 
-      /*  if (savedInstanceState == null) {
-            replaceFragment(FeedFragment())
-        }
-        */
+        /*  if (savedInstanceState == null) {
+              replaceFragment(FeedFragment())
+          }
+          */
 
         //navController.navigate(R.id.feedFragment)
 
@@ -159,29 +248,29 @@ class MainActivity : AppCompatActivity() {
             callback(user?.email)
         }
     }
-//    fun getUserName(): String {
+    //    fun getUserName(): String {
 //        return profileName;
 //    }
 //    fun getUserEmail(): String {
 //        return userEmail;
 //    }
-fun refreshProfile() {
-    val userServer = User.shared
-    userServer.getUser { user ->
-        if (user != null) {
-            val name = user["name"].toString()
-            val email = user["email"].toString()
-            val image= user["image"] as? String
+    fun refreshProfile() {
+        val userServer = User.shared
+        userServer.getUser { user ->
+            if (user != null) {
+                val name = user["name"].toString()
+                val email = user["email"].toString()
+                val image= user["image"] as? String
 
-            // Save to Room
-            lifecycleScope.launch {
-                val userDao = AppDatabase.getInstance(applicationContext).userDao()
-                userDao.clear() // Optional: clear old user
-                userDao.insert(UserEntity(email = email, name = name, profileImageUrl = image))
+                // Save to Room
+                lifecycleScope.launch {
+                    val userDao = AppDatabase.getInstance(applicationContext).userDao()
+                    userDao.clear() // Optional: clear old user
+                    userDao.insert(UserEntity(email = email, name = name, profileImageUrl = image))
+                }
             }
         }
     }
-}
     fun articlesButtonClicked(){
         navController.navigate(R.id.articlesFragment)
     }

@@ -140,7 +140,7 @@ class addPostFragment : Fragment() {
             }
         }
 
-        postViewModel.postOperationState.observe(viewLifecycleOwner) { result ->
+        postViewModel.postCreateState.observe(viewLifecycleOwner) { result ->
             result.onSuccess {
                 postText.text.clear()
                 Toast.makeText(context, "Your post was shared successfully!", Toast.LENGTH_LONG).show()

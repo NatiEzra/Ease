@@ -195,6 +195,9 @@ class MyPostsFragment : Fragment() {
     private fun getMyPosts() {
         postViewModel.fetchMyPosts()
         postViewModel.myPosts.observe(viewLifecycleOwner) { fetchedPosts ->
+            if(fetchedPosts.isEmpty()){
+                Toast.makeText(context, "You don't have any posts yet", Toast.LENGTH_SHORT).show()
+            }
             posts.clear()
             posts.addAll(fetchedPosts)
             adapter?.set(posts)
