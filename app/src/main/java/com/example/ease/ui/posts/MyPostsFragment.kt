@@ -107,7 +107,7 @@ class MyPostsViewHolder (itemView: View, private val onEditClick: (String) -> Un
 
 }
 
-class MyPostRecycleAdapter(private var posts : List<Post>?, private val onEditClick: (String) -> Unit,  private val onDeleteClick: (String) -> Unit): RecyclerView.Adapter<MyPostsViewHolder>() {
+class MyPostRecycleAdapter(var posts : List<Post>?, private val onEditClick: (String) -> Unit, private val onDeleteClick: (String) -> Unit): RecyclerView.Adapter<MyPostsViewHolder>() {
     override fun getItemCount(): Int {
         return posts?.size ?: 0
     }
@@ -172,6 +172,7 @@ class MyPostsFragment : Fragment() {
         postViewModel.deletePost(postId)
         postViewModel.postOperationState.observe(viewLifecycleOwner) { result ->
             result.onSuccess {
+
                 Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show()
                 getMyPosts()
             }
@@ -195,9 +196,11 @@ class MyPostsFragment : Fragment() {
     private fun getMyPosts() {
         postViewModel.fetchMyPosts()
         postViewModel.myPosts.observe(viewLifecycleOwner) { fetchedPosts ->
-            if(fetchedPosts.isEmpty()){
-                Toast.makeText(context, "You don't have any posts yet", Toast.LENGTH_SHORT).show()
+            if (fetchedPosts.size>0){
+                view?.findViewById<TextView>(R.id.noPostsTextView)?.visibility = View.GONE
+
             }
+
             posts.clear()
             posts.addAll(fetchedPosts)
             adapter?.set(posts)

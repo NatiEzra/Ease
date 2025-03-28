@@ -150,7 +150,12 @@ class FeedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         var view = inflater.inflate(R.layout.fragment_feed, container, false)
+        view.findViewById<TextView>(R.id.noPostsTextView).visibility = View.GONE
         postViewModel.posts.observe(viewLifecycleOwner) { fetchedPosts ->
+            if (fetchedPosts.size>0){
+                view.findViewById<TextView>(R.id.noPostsTextView).visibility = View.GONE
+
+            }
             posts.clear()
             posts.addAll(fetchedPosts)
             adapter?.set(posts)

@@ -29,8 +29,8 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "ease_db"
                 )
-                    .addMigrations(MIGRATION_1_2) // הוסף את זה!
-                    .fallbackToDestructiveMigration() // אם לא קריטי לאבד נתונים
+                    .addMigrations(MIGRATION_1_2)
+                    .fallbackToDestructiveMigration()
                     .build().also { INSTANCE = it }
             }
 
