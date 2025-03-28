@@ -85,31 +85,23 @@ class CloudinaryModel {
     }
 
     fun deleteImage(previousImageUrl: String, onComplete: (Boolean, String?) -> Unit) {
-        // שלב 1: הפקת ה־public_id מתוך ה־URL
         val publicId = extractPublicIdFromUrl(previousImageUrl)
 
-        // שלב 2: הרצת הפעולה במחוץ ל־Main Thread (למנוע חסימה של ממשק המשתמש)
         Thread {
             try {
-                // קריאה ל־destroy() של Cloudinary
                 val result = MediaManager.get()
                     .cloudinary
                     .uploader()
                     .destroy(publicId, emptyMap<String, Any>())
 
-                // אחרי סיום הפעולה - חוזרים ל־Main Thread כדי לדווח ל־onComplete
                 Handler(Looper.getMainLooper()).post {
-                    // בודקים מה החזירה Cloudinary
                     if (result["result"] == "ok") {
-                        // אם קיבלנו "ok", סימן שהמחיקה הצליחה
                         onComplete(true, null)
                     } else {
-                        // אם לא, מחזירים false ואת ההודעה (לרוב "not found" או שגיאה אחרת)
                         onComplete(false, result["result"] as? String)
                     }
                 }
             } catch (e: Exception) {
-                // במקרה של חריגה (למשל בעיית רשת) - נדווח על השגיאה ב־onComplete
                 Handler(Looper.getMainLooper()).post {
                     onComplete(false, e.message)
                 }
@@ -119,17 +111,11 @@ class CloudinaryModel {
 
 
     fun extractPublicIdFromUrl(url: String): String {
-        // 1) מסירים כל מה שלפני (כולל) המחרוזת "upload/"
         val afterUpload = url.substringAfter("upload/")
-        // לדוגמה, אחרי פעולה זו נקבל: "v1738327009/images/x64azxfunlrpskbq1qv0.jpg"
 
-        // 2) מסירים את החלק של הגרסה (vXXXXXX/) על ידי לקיחת המחרוזת שאחרי הסלאש הראשון
         val afterVersion = afterUpload.substringAfter("/")
-        // בדוגמה שלנו: "images/x64azxfunlrpskbq1qv0.jpg"
 
-        // 3) מסירים את הסיומת (למשל ".jpg" או ".png")
         return afterVersion.substringBeforeLast(".")
-        // נקבל: "images/x64azxfunlrpskbq1qv0"
     }
 
 
