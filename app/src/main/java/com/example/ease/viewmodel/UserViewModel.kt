@@ -16,6 +16,10 @@ class UserViewModel : ViewModel() {
     private val _profileImage = MutableLiveData<String?>()
     val profileImage: LiveData<String?> = _profileImage
 
+    private val _user = MutableLiveData<Map<String, Any>?>()
+    val user: LiveData<Map<String, Any>?> get() = _user
+
+
     private val _editUserResult = MutableLiveData<Result<Unit>>()
     val editUserResult: LiveData<Result<Unit>> = _editUserResult
 
@@ -44,4 +48,10 @@ class UserViewModel : ViewModel() {
             }
         }
     }
+    fun fetchUser() {
+        userRepo.getUser { userData ->
+            _user.postValue(userData)
+        }
+    }
+
 }

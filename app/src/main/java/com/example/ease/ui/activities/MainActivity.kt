@@ -8,7 +8,9 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -25,6 +27,7 @@ import com.example.ease.ui.auth.myProfileFragmentDirections
 import com.example.ease.ui.posts.FeedFragmentDirections
 import com.example.ease.ui.posts.MyPostsFragmentDirections
 import com.example.ease.ui.rest_apis.articlesFragmentDirections
+import com.example.ease.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -32,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private var profileName: String = ""
     private var userEmail: String = ""
+    private val userViewModel: UserViewModel by viewModels()
 
 
 
@@ -212,13 +216,18 @@ class MainActivity : AppCompatActivity() {
 //        }
 
 
-        var userServer= User.shared
-        userServer.getUser { user ->
+        userViewModel.fetchUser()
+
+        userViewModel.user.observe(this) { user ->
             if (user != null) {
-                val userDao = AppDatabase.getInstance(applicationContext).userDao()
+                val name = user["name"].toString()
+                val email = user["email"].toString()
+                val image = user["image"] as? String
+
                 lifecycleScope.launch {
+                    val userDao = AppDatabase.getInstance(applicationContext).userDao()
                     userDao.clear() // optional
-                    userDao.insert(UserEntity(email = user["email"].toString(), name = user["name"].toString(), profileImageUrl = user["image"] as? String))
+                    userDao.insert(UserEntity(email = email, name = name, profileImageUrl = image))
                 }
             }
         }
@@ -255,6 +264,22 @@ class MainActivity : AppCompatActivity() {
 //        return userEmail;
 //    }
     fun refreshProfile() {
+        userViewModel.fetchUser()
+
+        userViewModel.user.observe(this) { user ->
+        if (user != null) {
+                val name = user["name"].toString()
+                val email = user["email"].toString()
+                val image = user["image"] as? String
+
+                lifecycleScope.launch {
+                    val userDao = AppDatabase.getInstance(applicationContext).userDao()
+                    userDao.clear() // Optional
+                    userDao.insert(UserEntity(email = email, name = name, profileImageUrl = image))
+                }
+            }
+        }
+        /*
         val userServer = User.shared
         userServer.getUser { user ->
             if (user != null) {
@@ -269,7 +294,7 @@ class MainActivity : AppCompatActivity() {
                     userDao.insert(UserEntity(email = email, name = name, profileImageUrl = image))
                 }
             }
-        }
+        }*/
     }
     fun articlesButtonClicked(){
         navController.navigate(R.id.articlesFragment)

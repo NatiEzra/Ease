@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -11,14 +12,16 @@ import com.example.ease.R
 import com.example.ease.repositories.AuthRepository
 import com.example.ease.ui.auth.RegisterFragment
 import com.example.ease.ui.auth.loginFragment
+import com.example.ease.viewmodel.AuthViewModel
+import com.example.ease.viewmodel.UserViewModel
 
 
 class LoginRegisterActivity : AppCompatActivity() {
-    var authServer= AuthRepository.shared
+    private val authViewModel: AuthViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
-            if (authServer.isUserLoggedIn()) {
+            if (authViewModel.isUserLoggedIn()) {
                 navigateToHome()
                 return
             }

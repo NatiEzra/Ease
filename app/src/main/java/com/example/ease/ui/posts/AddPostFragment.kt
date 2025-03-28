@@ -177,6 +177,7 @@ class addPostFragment : Fragment() {
                     e.printStackTrace()
                     Toast.makeText(context, "Failed to load image", Toast.LENGTH_SHORT).show()
                 }
+                deleteImageButton.visibility = View.VISIBLE
             }
         }
 
