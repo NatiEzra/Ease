@@ -29,6 +29,7 @@ import com.example.ease.ui.posts.MyPostsFragmentDirections
 import com.example.ease.ui.rest_apis.articlesFragmentDirections
 import com.example.ease.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
+import com.example.ease.viewmodel.MapFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
@@ -156,6 +157,12 @@ class MainActivity : AppCompatActivity() {
                 launchSingleTop = true
             })
         }
+//map
+        val mapButton = findViewById<ImageView>(R.id.map_icon)
+        mapButton.setOnClickListener {
+            handleMapClick()
+        }
+
 
 // PROFILE
         findViewById<ImageView>(R.id.profile_icon).setOnClickListener {
@@ -195,7 +202,7 @@ class MainActivity : AppCompatActivity() {
 
 //        val addPostButton = findViewById<ImageView>(R.id.add_icon)
 //        addPostButton.setOnClickListener {
-//            addPostButtonClicked(false, null) // Ensure `AddPostFragment` exists
+//            addPostButtonClicked(false, null) // Ensure AddPostFragment exists
 //            //addtobackstack
 //
 //        }
@@ -238,6 +245,14 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    fun handleMapClick() {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.nav_host_fragment, MapFragment())
+            addToBackStack(null)
+            commit()
+        }
+    }
+
     fun MyPostsButtonClicked() {
         navController.navigate(R.id.myPostsFragment)
     }
@@ -267,7 +282,7 @@ class MainActivity : AppCompatActivity() {
         userViewModel.fetchUser()
 
         userViewModel.user.observe(this) { user ->
-        if (user != null) {
+            if (user != null) {
                 val name = user["name"].toString()
                 val email = user["email"].toString()
                 val image = user["image"] as? String
