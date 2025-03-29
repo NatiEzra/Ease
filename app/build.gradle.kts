@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.google.services)
     id("androidx.navigation.safeargs.kotlin")
     id ("kotlin-kapt")
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 
 
 }
@@ -37,6 +38,8 @@ android {
         buildConfigField("String", "API_SECRET", "\"${project.properties["API_SECRET"] ?: ""}\"")
         buildConfigField("String", "GOOGLE_CLIENT_ID", secretsProperties["GOOGLE_CLIENT_ID"] as String)
         buildConfigField("String", "Articles_Api", "\"${project.properties["Articles_Api"] ?: ""}\"")
+        buildConfigField("String", "GOOGLE_MAPS_API_KEY", "\"${project.properties["GOOGLE_MAPS_API_KEY"] ?: ""}\"")
+
 
 
     }
